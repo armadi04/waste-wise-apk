@@ -1465,9 +1465,29 @@ export interface components {
             /** @description WasteWise refresh token issued to a mobile client */
             refreshToken: string;
         };
+        TwoFactorStatusDto: {
+            enabled: boolean;
+            /** @description Unused recovery codes left */
+            recoveryCodesRemaining: number;
+        };
+        TwoFactorEnrollmentDto: {
+            /** @description Base32 TOTP secret for manual entry */
+            secret: string;
+            /** @description otpauth:// URI for authenticator apps */
+            otpauthUrl: string;
+            /** @description PNG data URL of the otpauth QR code */
+            qrDataUrl: string;
+        };
         TwoFactorCodeDto: {
             /** @description A 6-digit code from the authenticator app, or a recovery code */
             code: string;
+        };
+        RecoveryCodesDto: {
+            /** @description One-time recovery codes; shown only once */
+            recoveryCodes: string[];
+        };
+        MessageResponseDto: {
+            message: string;
         };
         ForgotPasswordDto: {
             /** @example user@example.com */
@@ -1559,6 +1579,16 @@ export interface components {
              */
             role: string;
         };
+        ReleaseNotesDto: {
+            /** @example 1.4.0 */
+            version: string;
+            /** @description Release body in Markdown */
+            notes: string;
+            /** Format: date-time */
+            publishedAt: string | null;
+            /** @description Release page URL */
+            url: string;
+        };
         CreateInvitationDto: {
             /** @example user@example.com */
             email: string;
@@ -1629,6 +1659,10 @@ export interface components {
             link: string | null;
             /** Format: date-time */
             createdAt: string;
+        };
+        PaginatedNotificationResponse: {
+            meta: components["schemas"]["PaginationMetaDto"];
+            data: components["schemas"]["Notification"][];
         };
         TokenRequestDto: {
             /** @enum {string} */
@@ -2106,10 +2140,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        enabled?: boolean;
-                        recoveryCodesRemaining?: number;
-                    };
+                    "application/json": components["schemas"]["TwoFactorStatusDto"];
                 };
             };
         };
@@ -2128,11 +2159,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        secret?: string;
-                        otpauthUrl?: string;
-                        qrDataUrl?: string;
-                    };
+                    "application/json": components["schemas"]["TwoFactorEnrollmentDto"];
                 };
             };
         };
@@ -2155,9 +2182,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        recoveryCodes?: string[];
-                    };
+                    "application/json": components["schemas"]["RecoveryCodesDto"];
                 };
             };
         };
@@ -2180,9 +2205,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        message?: string;
-                    };
+                    "application/json": components["schemas"]["MessageResponseDto"];
                 };
             };
         };
@@ -2205,9 +2228,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        recoveryCodes?: string[];
-                    };
+                    "application/json": components["schemas"]["RecoveryCodesDto"];
                 };
             };
         };
@@ -2485,7 +2506,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ReleaseNotesDto"][];
+                };
             };
         };
     };
@@ -2969,7 +2992,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Notification"][];
+                    "application/json": components["schemas"]["PaginatedNotificationResponse"];
                 };
             };
         };
