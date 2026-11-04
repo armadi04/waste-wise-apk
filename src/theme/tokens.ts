@@ -69,6 +69,14 @@ export interface ThemeColors {
   infoSolidHover: string;
   infoSolidPressed: string;
   infoSolidForeground: string;
+  progress: string;
+  progressBackground: string;
+  progressForeground: string;
+  progressBorder: string;
+  categoryOrganic: string;
+  categoryPlastic: string;
+  categoryPaper: string;
+  categoryUnknown: string;
   accent: string;
 }
 
@@ -141,6 +149,14 @@ export const lightColors: ThemeColors = {
   infoSolidHover: '#115E59',
   infoSolidPressed: '#134E4A',
   infoSolidForeground: '#FFFFFF',
+  progress: '#1D4ED8',
+  progressBackground: '#EFF6FF',
+  progressForeground: '#1E40AF',
+  progressBorder: '#3B82F6',
+  categoryOrganic: '#15803D',
+  categoryPlastic: '#A16207',
+  categoryPaper: '#1D4ED8',
+  categoryUnknown: '#52525B',
   accent: '#F3AA28',
 };
 
@@ -213,6 +229,14 @@ export const darkColors: ThemeColors = {
   infoSolidHover: '#115E59',
   infoSolidPressed: '#134E4A',
   infoSolidForeground: '#FFFFFF',
+  progress: '#60A5FA',
+  progressBackground: '#172554',
+  progressForeground: '#BFDBFE',
+  progressBorder: '#60A5FA',
+  categoryOrganic: '#4ADE80',
+  categoryPlastic: '#FACC15',
+  categoryPaper: '#93C5FD',
+  categoryUnknown: '#D4D4D8',
   accent: '#F3AA28',
 };
 
