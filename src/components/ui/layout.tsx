@@ -7,7 +7,10 @@ import {
   type RefreshControlProps,
   type ViewStyle,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 import { useTheme } from '@/theme';
 
@@ -19,6 +22,8 @@ interface ScreenProps {
   refreshControl?: React.ReactElement<RefreshControlProps>;
   contentContainerStyle?: ViewStyle;
   style?: ViewStyle;
+  /** Sticky bottom bar, rendered below the content with the bottom inset. */
+  footer?: ReactNode;
 }
 
 export function Screen({
@@ -27,12 +32,18 @@ export function Screen({
   refreshControl,
   contentContainerStyle,
   style,
+  footer,
 }: ScreenProps) {
   const { colors, spacing } = useTheme();
+  const insets = useSafeAreaInsets();
   const content = scroll ? (
     <ScrollView
       contentContainerStyle={[
-        { padding: spacing.lg, gap: spacing.lg, paddingBottom: spacing.huge },
+        {
+          padding: spacing.lg,
+          gap: spacing.lg,
+          paddingBottom: footer ? spacing.xxl : spacing.huge,
+        },
         contentContainerStyle,
       ]}
       keyboardShouldPersistTaps="handled"
@@ -58,6 +69,21 @@ export function Screen({
       style={[{ flex: 1, backgroundColor: colors.background }, style]}
     >
       {content}
+      {footer ? (
+        <View
+          style={{
+            borderTopWidth: 1,
+            borderTopColor: colors.borderSubtle,
+            backgroundColor: colors.surface,
+            paddingHorizontal: spacing.lg,
+            paddingTop: spacing.md,
+            paddingBottom: spacing.md + insets.bottom,
+            gap: spacing.sm,
+          }}
+        >
+          {footer}
+        </View>
+      ) : null}
     </SafeAreaView>
   );
 }
