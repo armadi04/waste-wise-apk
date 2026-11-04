@@ -28,6 +28,11 @@ jest.mock('expo-router', () => {
 jest.mock('@/hooks/use-notifications', () => ({
   useUnreadNotificationCount: () => ({ data: 2 }),
 }));
+jest.mock('@/hooks/use-two-factor', () => ({
+  useTwoFactorStatus: () => ({
+    data: { enabled: true, recoveryCodesRemaining: 8 },
+  }),
+}));
 jest.mock('expo-constants', () => ({
   __esModule: true,
   default: { expoConfig: { version: '1.2.3' } },
@@ -111,7 +116,7 @@ describe('profile screen', () => {
 
     for (const [label, route] of [
       ['Edit profile', '/profile/edit'],
-      ['Security, Two-factor authentication', '/profile/security'],
+      ['Security, Two-factor authentication, On', '/profile/security'],
       ['Sessions, Devices signed in to your account', '/profile/sessions'],
       ['Notifications, 2 new', '/notifications'],
       ["What's new, v1.2.3", '/changelog'],

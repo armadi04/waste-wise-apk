@@ -66,6 +66,7 @@ function RootNavigator() {
           <Stack.Screen name="notifications" />
           <Stack.Screen name="changelog" />
           <Stack.Screen name="profile/edit" />
+          <Stack.Screen name="profile/security" />
         </Stack.Protected>
         <Stack.Protected guard={status !== 'authenticated'}>
           <Stack.Screen name="(auth)" />

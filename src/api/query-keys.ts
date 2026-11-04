@@ -4,6 +4,7 @@ export const queryKeys = {
   auth: {
     me: ['auth', 'me'] as const,
     profile: ['auth', 'profile'] as const,
+    twoFactor: ['auth', 'two-factor'] as const,
   },
   stats: {
     reports: ['stats', 'reports'] as const,

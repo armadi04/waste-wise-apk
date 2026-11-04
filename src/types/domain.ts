@@ -77,3 +77,22 @@ export interface ReleaseNotes {
 export type TimeZoneConfig = components['schemas']['TimeZoneConfigResponseDto'];
 export type TimeZonePreference =
   components['schemas']['TimeZonePreferenceResponseDto'];
+
+/*
+ * 2FA management responses. Swagger only has inline schemas for these; they
+ * mirror ../waste-wise-web/backend/src/auth/auth.controller.ts (`2fa*`).
+ */
+export interface TwoFactorStatus {
+  enabled: boolean;
+  recoveryCodesRemaining: number;
+}
+
+export interface TwoFactorSetup {
+  secret: string;
+  otpauthUrl: string;
+  qrDataUrl: string;
+}
+
+export interface RecoveryCodes {
+  recoveryCodes: string[];
+}
