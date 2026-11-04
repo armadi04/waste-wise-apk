@@ -8,6 +8,14 @@ import {
 
 import LoginScreen from '../../app/(auth)/login';
 
+jest.mock('expo-router', () => {
+  const router = { push: jest.fn(), replace: jest.fn() };
+  return {
+    useRouter: () => router,
+    __router: router,
+  };
+});
+
 jest.mock('@/auth/auth-provider', () => {
   const state = {
     isSigningIn: false,
@@ -41,6 +49,7 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 
 jest.mock('@/lib/config', () => ({ IS_GOOGLE_CONFIGURED: true }));
+jest.mock('expo-image', () => ({ Image: () => null }));
 jest.mock('@/components/ui/google-icon', () => ({ GoogleIcon: () => null }));
 jest.mock('lucide-react-native', () => ({ ShieldCheck: () => null }));
 jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
@@ -54,16 +63,32 @@ const authState = (
   }
 ).__authState;
 
+const router = (
+  jest.requireMock('expo-router') as {
+    __router: { push: jest.Mock; replace: jest.Mock };
+  }
+).__router;
+
 describe('login screen', () => {
   beforeEach(() => {
     authState.isSigningIn = false;
     authState.signInWithGoogle.mockReset();
+    router.push.mockReset();
+    router.replace.mockReset();
   });
 
   it('renders one Google CTA without a register toggle', async () => {
     await render(<LoginScreen />);
 
+    expect(screen.getByText('Welcome to WasteWise')).toBeTruthy();
+    expect(screen.getByText('REPORT · CLASSIFY · MANAGE')).toBeTruthy();
+    expect(screen.getByTestId('auth-logo')).toBeTruthy();
     expect(screen.getByText('Continue with Google')).toBeTruthy();
+    expect(
+      screen.getByText(
+        'New to WasteWise? Your account is created automatically on first sign-in.',
+      ),
+    ).toBeTruthy();
     expect(screen.queryByText('Sign up')).toBeNull();
     expect(screen.queryByText('Log In')).toBeNull();
   });
@@ -76,6 +101,19 @@ describe('login screen', () => {
 
     await waitFor(() =>
       expect(authState.signInWithGoogle).toHaveBeenCalledTimes(1),
+    );
+  });
+
+  it('opens the two-factor screen when a challenge is required', async () => {
+    authState.signInWithGoogle.mockResolvedValue({
+      status: 'two-factor-required',
+    });
+    await render(<LoginScreen />);
+
+    fireEvent.press(screen.getByTestId('google-sign-in-button'));
+
+    await waitFor(() =>
+      expect(router.push).toHaveBeenCalledWith('/two-factor'),
     );
   });
 

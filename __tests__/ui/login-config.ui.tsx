@@ -31,6 +31,7 @@ jest.mock('react-native-safe-area-context', () => ({
 }));
 
 jest.mock('@/lib/config', () => ({ IS_GOOGLE_CONFIGURED: false }));
+jest.mock('expo-image', () => ({ Image: () => null }));
 jest.mock('@/components/ui/google-icon', () => ({ GoogleIcon: () => null }));
 jest.mock('lucide-react-native', () => ({ ShieldCheck: () => null }));
 jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
