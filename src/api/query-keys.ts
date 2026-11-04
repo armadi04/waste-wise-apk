@@ -1,4 +1,4 @@
-import type { ReportStatus } from '@/types/domain';
+import type { ReportListFilters, ReportStatus } from '@/types/domain';
 
 export const queryKeys = {
   auth: {
@@ -10,8 +10,20 @@ export const queryKeys = {
   },
   reports: {
     all: ['reports'] as const,
-    list: (status?: ReportStatus, search?: string) =>
-      ['reports', 'list', status ?? 'ALL', search ?? ''] as const,
+    list: (
+      status?: ReportStatus,
+      search?: string,
+      filters: ReportListFilters = {},
+    ) =>
+      [
+        'reports',
+        'list',
+        status ?? 'ALL',
+        search ?? '',
+        filters.category ?? '',
+        filters.from ?? '',
+        filters.to ?? '',
+      ] as const,
     detail: (id: number) => ['reports', 'detail', id] as const,
   },
 } as const;

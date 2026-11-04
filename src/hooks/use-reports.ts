@@ -8,12 +8,18 @@ import {
 import { queryKeys } from '@/api/query-keys';
 import {
   createReport,
+  deleteReport,
   getReport,
   getReportStats,
   listReports,
+  updateReport,
   type CreateReportInput,
 } from '@/api/reports.api';
-import type { ReportFilter } from '@/types/domain';
+import type {
+  ReportFilter,
+  ReportListFilters,
+  UpdateReportPayload,
+} from '@/types/domain';
 
 export function useReportStats() {
   return useQuery({
@@ -23,17 +29,22 @@ export function useReportStats() {
   });
 }
 
-export function useReports(filter: ReportFilter, search = '') {
+export function useReports(
+  filter: ReportFilter,
+  search = '',
+  filters: ReportListFilters = {},
+) {
   const status = filter === 'ALL' ? undefined : filter;
   const term = search.trim();
   return useInfiniteQuery({
-    queryKey: queryKeys.reports.list(status, term),
+    queryKey: queryKeys.reports.list(status, term, filters),
     queryFn: ({ pageParam }) =>
       listReports({
         page: pageParam,
         limit: 20,
         status,
         search: term || undefined,
+        ...filters,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
@@ -59,6 +70,34 @@ export function useCreateReport() {
     mutationFn: (input: CreateReportInput) => createReport(input),
     onSuccess: async (report) => {
       queryClient.setQueryData(queryKeys.reports.detail(report.id), report);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.stats.reports }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.reports.all }),
+      ]);
+    },
+  });
+}
+
+export function useUpdateReport(id: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: UpdateReportPayload) => updateReport(id, payload),
+    onSuccess: async (report) => {
+      queryClient.setQueryData(queryKeys.reports.detail(report.id), report);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.stats.reports }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.reports.all }),
+      ]);
+    },
+  });
+}
+
+export function useDeleteReport() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => deleteReport(id),
+    onSuccess: async (_data, id) => {
+      queryClient.removeQueries({ queryKey: queryKeys.reports.detail(id) });
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: queryKeys.stats.reports }),
         queryClient.invalidateQueries({ queryKey: queryKeys.reports.all }),

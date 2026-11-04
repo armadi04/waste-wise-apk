@@ -36,6 +36,21 @@ export interface ReportListParams {
   limit: number;
   status?: ReportStatus;
   search?: string;
+  category?: WasteCategory;
+  /** Inclusive start date, YYYY-MM-DD. */
+  from?: string;
+  /** Inclusive end date, YYYY-MM-DD. */
+  to?: string;
 }
+
+/** Optional list filters beyond status and search. */
+export type ReportListFilters = Pick<
+  ReportListParams,
+  'category' | 'from' | 'to'
+>;
+
+export type UpdateReportPayload = Partial<
+  components['schemas']['CreateReportDto']
+>;
 
 export type ReportFilter = 'ALL' | ReportStatus;
