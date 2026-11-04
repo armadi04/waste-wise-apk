@@ -69,6 +69,7 @@ export interface ThemeColors {
   infoSolidHover: string;
   infoSolidPressed: string;
   infoSolidForeground: string;
+  scrim: string;
   progress: string;
   progressBackground: string;
   progressForeground: string;
@@ -149,6 +150,7 @@ export const lightColors: ThemeColors = {
   infoSolidHover: '#115E59',
   infoSolidPressed: '#134E4A',
   infoSolidForeground: '#FFFFFF',
+  scrim: 'rgba(9, 9, 11, 0.55)',
   progress: '#1D4ED8',
   progressBackground: '#EFF6FF',
   progressForeground: '#1E40AF',
@@ -229,6 +231,7 @@ export const darkColors: ThemeColors = {
   infoSolidHover: '#115E59',
   infoSolidPressed: '#134E4A',
   infoSolidForeground: '#FFFFFF',
+  scrim: 'rgba(0, 0, 0, 0.72)',
   progress: '#60A5FA',
   progressBackground: '#172554',
   progressForeground: '#BFDBFE',
