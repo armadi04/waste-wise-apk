@@ -1,15 +1,26 @@
+import { Image } from 'expo-image';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Circle, G, Path } from 'react-native-svg';
+import Svg, {
+  Circle,
+  Defs,
+  G,
+  LinearGradient,
+  Path,
+  RadialGradient,
+  Rect,
+  Stop,
+} from 'react-native-svg';
 
+import logo from '@/assets/brand/logo.png';
 import { authCopy } from '@/auth/auth-copy';
 import { AppText } from '@/components/ui/text';
 import { useTheme } from '@/theme';
 
-const HERO_BOTTOM_SPACE = 56;
-const HERO_COPY_WIDTH = 320;
+const HERO_BOTTOM_SPACE = 48;
+const HERO_COPY_WIDTH = 330;
 
-function AuthHeaderPattern() {
+function AuthBackdrop() {
   const { colors } = useTheme();
 
   return (
@@ -22,78 +33,114 @@ function AuthHeaderPattern() {
       <Svg
         width="100%"
         height="100%"
-        viewBox="0 0 400 280"
+        viewBox="0 0 400 640"
         preserveAspectRatio="xMidYMid slice"
       >
-        <G fill={colors.brandForeground} opacity={0.08}>
-          <Circle cx={34} cy={44} r={1.4} />
-          <Circle cx={92} cy={82} r={1} />
-          <Circle cx={144} cy={32} r={1.2} />
-          <Circle cx={214} cy={68} r={0.9} />
-          <Circle cx={278} cy={38} r={1.4} />
-          <Circle cx={334} cy={94} r={1.1} />
-          <Circle cx={372} cy={54} r={0.9} />
-          <Circle cx={54} cy={126} r={1} />
-          <Circle cx={306} cy={142} r={1.2} />
-          <Path d="M0 280V248h44v-24c0-13 10-23 23-23s23 10 23 23v24h52v-38c0-18 14-32 32-32s32 14 32 32v38h60v-30c0-15 12-27 27-27s27 12 27 27v30h60v-20c0-11 9-20 20-20s20 9 20 20v20Z" />
-        </G>
+        <Defs>
+          <LinearGradient id="authGradient" x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0" stopColor={colors.brand} />
+            <Stop offset="1" stopColor={colors.brandPressed} />
+          </LinearGradient>
+          <RadialGradient id="authGlow" cx="0.82" cy="0.12" r="0.72">
+            <Stop offset="0" stopColor={colors.primary} stopOpacity={0.34} />
+            <Stop offset="1" stopColor={colors.brand} stopOpacity={0} />
+          </RadialGradient>
+        </Defs>
+
+        <Rect width="400" height="640" fill="url(#authGradient)" />
+        <Rect width="400" height="640" fill="url(#authGlow)" />
+
         <G
           fill="none"
           stroke={colors.brandForeground}
           strokeWidth={1.2}
-          opacity={0.13}
+          opacity={0.11}
         >
-          <Path d="M118 280V154c0-54 36-88 82-88s82 34 82 88v126" />
-          <Path d="M154 280V172c0-35 22-58 46-58s46 23 46 58v108" />
+          <Circle cx={348} cy={92} r={176} />
+          <Circle cx={348} cy={92} r={112} />
+          <Path d="M-60 432c82-112 192-164 302-164s220 52 302 164" />
+          <Path d="M-60 472c82-112 192-164 302-164s220 52 302 164" />
+        </G>
+
+        <G fill={colors.brandForeground} opacity={0.1}>
+          <Circle cx={44} cy={58} r={1.5} />
+          <Circle cx={108} cy={104} r={1} />
+          <Circle cx={182} cy={48} r={1.2} />
+          <Circle cx={246} cy={126} r={1} />
+          <Circle cx={316} cy={72} r={1.4} />
+          <Circle cx={366} cy={148} r={1} />
+          <Circle cx={70} cy={178} r={1.1} />
         </G>
       </Svg>
     </View>
   );
 }
 
-export function AuthHero() {
+export function AuthHero({
+  title = authCopy.title,
+  subtitle = authCopy.subtitle,
+}: {
+  title?: string;
+  subtitle?: string;
+}) {
   const { colors, spacing } = useTheme();
   const insets = useSafeAreaInsets();
 
   return (
     <View
       style={[
-        styles.header,
+        styles.hero,
         {
-          paddingTop: insets.top,
+          gap: spacing.xxxl,
+          paddingTop: insets.top + spacing.md,
           paddingHorizontal: spacing.xxl,
         },
       ]}
     >
-      <AuthHeaderPattern />
-      <View
-        style={[styles.content, { gap: spacing.sm, paddingTop: spacing.sm }]}
-      >
-        <AppText
-          variant="cardTitle"
-          color={colors.accent}
-          weight="semibold"
-          style={{ letterSpacing: 0.4 }}
+      <AuthBackdrop />
+
+      <View style={[styles.brandRow, { gap: spacing.md }]}>
+        <View
+          testID="auth-logo"
+          accessible={false}
+          style={[styles.logoTile, { backgroundColor: colors.brandForeground }]}
         >
-          {authCopy.brand}
-        </AppText>
+          <Image
+            source={logo}
+            contentFit="contain"
+            accessible={false}
+            style={styles.logo}
+          />
+        </View>
+        <View style={styles.brandText}>
+          <AppText variant="cardTitle" color={colors.accent} weight="semibold">
+            {authCopy.brand}
+          </AppText>
+          <AppText
+            variant="caption"
+            color={colors.brandMutedForeground}
+            style={{ letterSpacing: 1.2 }}
+          >
+            {authCopy.tagline}
+          </AppText>
+        </View>
+      </View>
+
+      <View style={[styles.copy, { gap: spacing.sm }]}>
         <AppText
           variant="display"
           color={colors.brandForeground}
           accessibilityRole="header"
-          style={{ textAlign: 'center', letterSpacing: -0.4 }}
+          style={{ letterSpacing: -0.6 }}
         >
-          {authCopy.title}
+          {title}
         </AppText>
         <AppText
           variant="body"
           color={colors.brandMutedForeground}
-          style={{
-            maxWidth: HERO_COPY_WIDTH,
-            textAlign: 'center',
-          }}
+          style={{ maxWidth: HERO_COPY_WIDTH }}
         >
-          {authCopy.subtitle}
+          {subtitle}
         </AppText>
       </View>
     </View>
@@ -101,10 +148,30 @@ export function AuthHero() {
 }
 
 const styles = StyleSheet.create({
-  header: {
+  hero: {
+    flexGrow: 1,
+    justifyContent: 'space-between',
     paddingBottom: HERO_BOTTOM_SPACE,
   },
-  content: {
+  brandRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+  },
+  logoTile: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logo: {
+    width: 31,
+    height: 31,
+  },
+  brandText: {
+    gap: 2,
+  },
+  copy: {
+    maxWidth: HERO_COPY_WIDTH,
   },
 });

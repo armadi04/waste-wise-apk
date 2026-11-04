@@ -36,7 +36,7 @@ export function GoogleSignInButton({
           <GoogleIcon size={17} />
         </View>
       }
-      style={{ borderRadius: radius.pill, minHeight: 54 }}
+      style={{ borderRadius: radius.lg, minHeight: 56 }}
     />
   );
 }
