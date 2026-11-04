@@ -3,14 +3,12 @@ import { ActivityIndicator, View } from 'react-native';
 
 import { Button } from '@/components/ui/button';
 import { AppText } from '@/components/ui/text';
+import type { Coordinates } from '@/lib/location';
 import { useTheme } from '@/theme';
 
 export type LocationState = 'idle' | 'loading' | 'ready' | 'error';
 
-export interface Coordinates {
-  latitude: number;
-  longitude: number;
-}
+export type { Coordinates };
 
 export function LocationStatus({
   state,
