@@ -1,4 +1,9 @@
-import type { MobileGoogleLoginResponse, User } from '@/types/domain';
+import type {
+  MobileGoogleLoginResponse,
+  MobileTwoFactorVerifyResponse,
+  TwoFactorVerifyPayload,
+  User,
+} from '@/types/domain';
 
 import api from './client';
 
@@ -8,6 +13,16 @@ export async function googleMobileLogin(
   const { data } = await api.post<MobileGoogleLoginResponse>(
     '/auth/mobile/google',
     { token: idToken },
+  );
+  return data;
+}
+
+export async function verifyMobileTwoFactor(
+  payload: TwoFactorVerifyPayload,
+): Promise<MobileTwoFactorVerifyResponse> {
+  const { data } = await api.post<MobileTwoFactorVerifyResponse>(
+    '/auth/mobile/2fa/verify',
+    payload,
   );
   return data;
 }

@@ -19,14 +19,17 @@ export interface PaginatedReports {
   meta: PaginationMeta;
 }
 
-export interface AuthSession {
-  accessToken: string;
-  refreshToken: string;
-  sessionExpiresAt: string;
-}
+export type AuthSession = components['schemas']['MobileAuthSessionDto'];
 
 export type MobileGoogleLoginResponse =
-  AuthSession | { twoFactorRequired: true; challengeToken: string };
+  | components['schemas']['MobileAuthSessionDto']
+  | components['schemas']['MobileTwoFactorChallengeDto'];
+
+export type MobileTwoFactorVerifyResponse =
+  components['schemas']['MobileAuthSessionDto'];
+
+export type TwoFactorVerifyPayload =
+  components['schemas']['TwoFactorVerifyDto'];
 
 export interface ReportListParams {
   page: number;

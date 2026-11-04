@@ -15,7 +15,12 @@ import {
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 
-import { getProfile, googleMobileLogin, logoutMobile } from '@/api/auth.api';
+import {
+  getProfile,
+  googleMobileLogin,
+  logoutMobile,
+  verifyMobileTwoFactor,
+} from '@/api/auth.api';
 import { setUnauthorizedHandler } from '@/api/client';
 import { queryKeys } from '@/api/query-keys';
 import {
@@ -34,13 +39,21 @@ type AuthStatus = 'loading' | 'guest' | 'authenticated' | 'restore-error';
 export type GoogleSignInResult =
   | { status: 'success' }
   | { status: 'cancelled' }
+  | { status: 'two-factor-required' }
   | { status: 'error'; error: AuthFailure };
+
+export type TwoFactorVerifyResult =
+  { status: 'success' } | { status: 'error'; error: AuthFailure };
 
 interface AuthContextValue {
   status: AuthStatus;
   user: User | null;
   isSigningIn: boolean;
+  isTwoFactorPending: boolean;
+  isVerifyingTwoFactor: boolean;
   signInWithGoogle: () => Promise<GoogleSignInResult>;
+  verifyTwoFactor: (code: string) => Promise<TwoFactorVerifyResult>;
+  cancelTwoFactor: () => void;
   retrySessionRestore: () => Promise<void>;
   signOut: () => Promise<void>;
   reloadProfile: () => Promise<void>;
@@ -53,7 +66,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [status, setStatus] = useState<AuthStatus>('loading');
   const [user, setUser] = useState<User | null>(null);
   const [isSigningIn, setIsSigningIn] = useState(false);
+  const [isTwoFactorPending, setIsTwoFactorPending] = useState(false);
+  const [isVerifyingTwoFactor, setIsVerifyingTwoFactor] = useState(false);
+  const [twoFactorChallenge, setTwoFactorChallenge] = useState<string | null>(
+    null,
+  );
   const signingInRef = useRef(false);
+  const verifyingTwoFactorRef = useRef(false);
 
   const applyAuthenticated = useCallback(
     (profile: User) => {
@@ -143,6 +162,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
       signingInRef.current = true;
       setIsSigningIn(true);
+      setTwoFactorChallenge(null);
+      setIsTwoFactorPending(false);
 
       try {
         const idToken = await requestGoogleIdToken();
@@ -152,16 +173,17 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
         const result = await googleMobileLogin(idToken);
         if ('twoFactorRequired' in result) {
-          return {
-            status: 'error',
-            error: authFailure('two_factor_required'),
-          };
+          setTwoFactorChallenge(result.challengeToken);
+          setIsTwoFactorPending(true);
+          return { status: 'two-factor-required' };
         }
 
         const session: AuthSession = result;
         await saveTokens(session);
         await loadProfile();
         await queryClient.invalidateQueries();
+        setTwoFactorChallenge(null);
+        setIsTwoFactorPending(false);
         return { status: 'success' };
       } catch (error) {
         if (
@@ -177,6 +199,47 @@ export function AuthProvider({ children }: PropsWithChildren) {
       }
     }, [loadProfile, queryClient]);
 
+  const verifyTwoFactor = useCallback(
+    async (code: string): Promise<TwoFactorVerifyResult> => {
+      if (!twoFactorChallenge) {
+        return {
+          status: 'error',
+          error: authFailure('two_factor_challenge_expired'),
+        };
+      }
+      if (verifyingTwoFactorRef.current) {
+        return { status: 'error', error: authFailure('unknown') };
+      }
+
+      verifyingTwoFactorRef.current = true;
+      setIsVerifyingTwoFactor(true);
+
+      try {
+        const session = await verifyMobileTwoFactor({
+          challengeToken: twoFactorChallenge,
+          code,
+        });
+        await saveTokens(session);
+        await loadProfile();
+        await queryClient.invalidateQueries();
+        setTwoFactorChallenge(null);
+        setIsTwoFactorPending(false);
+        return { status: 'success' };
+      } catch (error) {
+        return { status: 'error', error: toAuthFailure(error) };
+      } finally {
+        verifyingTwoFactorRef.current = false;
+        setIsVerifyingTwoFactor(false);
+      }
+    },
+    [loadProfile, queryClient, twoFactorChallenge],
+  );
+
+  const cancelTwoFactor = useCallback(() => {
+    setTwoFactorChallenge(null);
+    setIsTwoFactorPending(false);
+  }, []);
+
   const retrySessionRestore = useCallback(async () => {
     await restore();
   }, [restore]);
@@ -188,6 +251,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
     await signOutFromGoogle();
     await clearTokens();
+    setTwoFactorChallenge(null);
+    setIsTwoFactorPending(false);
     setUser(null);
     setStatus('guest');
     queryClient.clear();
@@ -207,19 +272,27 @@ export function AuthProvider({ children }: PropsWithChildren) {
       status,
       user,
       isSigningIn,
+      isTwoFactorPending,
+      isVerifyingTwoFactor,
       signInWithGoogle,
+      verifyTwoFactor,
+      cancelTwoFactor,
       retrySessionRestore,
       signOut,
       reloadProfile,
     }),
     [
+      cancelTwoFactor,
       isSigningIn,
+      isTwoFactorPending,
+      isVerifyingTwoFactor,
       reloadProfile,
       retrySessionRestore,
       signInWithGoogle,
       signOut,
       status,
       user,
+      verifyTwoFactor,
     ],
   );
 

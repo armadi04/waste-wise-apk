@@ -123,6 +123,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/mobile/2fa/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Finish a mobile login with two-factor verification */
+        post: operations["AuthController_mobileVerifyTwoFactor_v1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/mobile/refresh": {
         parameters: {
             query?: never;
@@ -1415,6 +1432,17 @@ export interface components {
             meta: components["schemas"]["PaginationMetaDto"];
             data: components["schemas"]["AuditLog"][];
         };
+        MobileAuthSessionDto: {
+            accessToken: string;
+            refreshToken: string;
+            /** Format: date-time */
+            sessionExpiresAt: string;
+        };
+        MobileTwoFactorChallengeDto: {
+            /** @example true */
+            twoFactorRequired: boolean;
+            challengeToken: string;
+        };
         LoginDto: {
             /** @example admin@example.com */
             email: string;
@@ -1427,15 +1455,15 @@ export interface components {
             /** @description Google ID Token */
             token: string;
         };
-        MobileRefreshTokenDto: {
-            /** @description WasteWise refresh token issued to a mobile client */
-            refreshToken: string;
-        };
         TwoFactorVerifyDto: {
             /** @description The challenge token returned by /auth/login */
             challengeToken: string;
             /** @description A 6-digit code from the authenticator app, or a recovery code */
             code: string;
+        };
+        MobileRefreshTokenDto: {
+            /** @description WasteWise refresh token issued to a mobile client */
+            refreshToken: string;
         };
         TwoFactorCodeDto: {
             /** @description A 6-digit code from the authenticator app, or a recovery code */
@@ -1955,12 +1983,32 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        accessToken?: string;
-                        refreshToken?: string;
-                        /** Format: date-time */
-                        sessionExpiresAt?: string;
-                    };
+                    "application/json": components["schemas"]["MobileAuthSessionDto"] | components["schemas"]["MobileTwoFactorChallengeDto"];
+                };
+            };
+        };
+    };
+    AuthController_mobileVerifyTwoFactor_v1: {
+        parameters: {
+            query?: never;
+            header: {
+                "user-agent": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TwoFactorVerifyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MobileAuthSessionDto"];
                 };
             };
         };
@@ -1985,12 +2033,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        accessToken?: string;
-                        refreshToken?: string;
-                        /** Format: date-time */
-                        sessionExpiresAt?: string;
-                    };
+                    "application/json": components["schemas"]["MobileAuthSessionDto"];
                 };
             };
         };

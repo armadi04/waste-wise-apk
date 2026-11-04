@@ -1,8 +1,11 @@
 import { toApiError } from '@/api/errors';
-import { isInvalidSessionError } from '@/api/session';
 
 export type AuthErrorCode =
-  | 'two_factor_required'
+  | 'two_factor_invalid_code'
+  | 'two_factor_challenge_expired'
+  | 'two_factor_challenge_invalid'
+  | 'account_locked'
+  | 'account_inactive'
   | 'play_services_unavailable'
   | 'network'
   | 'server'
@@ -16,8 +19,13 @@ export interface AuthFailure {
 }
 
 const authFailureMessages: Record<AuthErrorCode, string> = {
-  two_factor_required:
-    'This account uses two-factor authentication. Complete verification in the web app, then try again.',
+  two_factor_invalid_code:
+    'That code is not valid. Check the code and try again.',
+  two_factor_challenge_expired: 'Your sign-in attempt expired. Start again.',
+  two_factor_challenge_invalid: 'Your sign-in attempt is invalid. Start again.',
+  account_locked: 'Too many failed attempts. Wait a few minutes and try again.',
+  account_inactive:
+    'This WasteWise account is inactive. Contact support if you need help.',
   play_services_unavailable:
     'Google Play Services is unavailable or needs an update.',
   network:
@@ -28,8 +36,11 @@ const authFailureMessages: Record<AuthErrorCode, string> = {
   unknown: 'Something went wrong. Please try again.',
 };
 
-export function authFailure(code: AuthErrorCode): AuthFailure {
-  return { code, message: authFailureMessages[code] };
+export function authFailure(
+  code: AuthErrorCode,
+  message?: string,
+): AuthFailure {
+  return { code, message: message ?? authFailureMessages[code] };
 }
 
 function hasErrorCode(error: unknown, code: string): boolean {
@@ -40,16 +51,32 @@ function hasErrorCode(error: unknown, code: string): boolean {
   );
 }
 
+const apiCodeMap: Record<string, AuthErrorCode> = {
+  TWO_FACTOR_INVALID_CODE: 'two_factor_invalid_code',
+  TWO_FACTOR_CHALLENGE_EXPIRED: 'two_factor_challenge_expired',
+  TWO_FACTOR_CHALLENGE_INVALID: 'two_factor_challenge_invalid',
+  ACCOUNT_LOCKED: 'account_locked',
+  ACCOUNT_INACTIVE: 'account_inactive',
+};
+
 export function toAuthFailure(error: unknown): AuthFailure {
   if (hasErrorCode(error, 'PLAY_SERVICES_NOT_AVAILABLE')) {
     return authFailure('play_services_unavailable');
   }
 
-  if (isInvalidSessionError(error)) {
-    return authFailure('unauthorized');
+  const apiError = toApiError(error);
+
+  const code = apiError.code ? apiCodeMap[apiError.code] : undefined;
+  if (code) {
+    return authFailure(
+      code,
+      code === 'account_locked' ? apiError.message : undefined,
+    );
   }
 
-  const apiError = toApiError(error);
+  if (apiError.status === 401 || apiError.status === 403) {
+    return authFailure('unauthorized');
+  }
   if (apiError.status === 429) {
     return authFailure('too_many_attempts');
   }
