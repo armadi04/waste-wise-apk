@@ -16,6 +16,7 @@ export async function listReports(
       sort: 'createdAt',
       direction: 'DESC',
       ...(params.status ? { status: params.status } : {}),
+      ...(params.search ? { search: params.search } : {}),
     },
   });
   return data;

@@ -23,14 +23,17 @@ export function useReportStats() {
   });
 }
 
-export function useReports(filter: ReportFilter) {
+export function useReports(filter: ReportFilter, search = '') {
+  const status = filter === 'ALL' ? undefined : filter;
+  const term = search.trim();
   return useInfiniteQuery({
-    queryKey: queryKeys.reports.list(filter === 'ALL' ? undefined : filter),
+    queryKey: queryKeys.reports.list(status, term),
     queryFn: ({ pageParam }) =>
       listReports({
         page: pageParam,
         limit: 20,
-        status: filter === 'ALL' ? undefined : filter,
+        status,
+        search: term || undefined,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>

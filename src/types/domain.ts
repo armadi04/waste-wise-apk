@@ -35,6 +35,7 @@ export interface ReportListParams {
   page: number;
   limit: number;
   status?: ReportStatus;
+  search?: string;
 }
 
 export type ReportFilter = 'ALL' | ReportStatus;

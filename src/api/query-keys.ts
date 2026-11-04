@@ -10,8 +10,8 @@ export const queryKeys = {
   },
   reports: {
     all: ['reports'] as const,
-    list: (status?: ReportStatus) =>
-      ['reports', 'list', status ?? 'ALL'] as const,
+    list: (status?: ReportStatus, search?: string) =>
+      ['reports', 'list', status ?? 'ALL', search ?? ''] as const,
     detail: (id: number) => ['reports', 'detail', id] as const,
   },
 } as const;
