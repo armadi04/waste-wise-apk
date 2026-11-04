@@ -240,6 +240,15 @@ supports them. Long list rows use truncation plus accessible full content where 
   instead of stretching it to fill the screen; the hero absorbs remaining height. Use
   `surface` for the dock so dark mode does not render a pure black plane. Anchor the CTA at the
   bottom of the dock for thumb reach.
+- The login hero shows `AuthIllustration` (decorative SVG, hidden from accessibility) in the
+  space between the brand row and the headline; it flexes between 120 and 280 dp so the dock
+  never scrolls off-screen. Other auth screens (two-factor) omit it. The hero is always a dark
+  brand surface, so the illustration uses the dark-theme category hues in both modes.
+- The login dock holds only the Google button, one reassurance caption and errors. Do not
+  repeat the hero message as a dock title.
+- The Google button follows Google's sign-in branding: `google-button-*` tokens (light
+  #FFFFFF / #747775 border / #1F1F1F text, dark #131314 / #8E918F border / #E3E3E3 text),
+  the full-colour G with no badge, pill shape and 56 dp height. Never tint it with `primary`.
 - "New report" is a global action: the circular `+` beside the floating tab bar. Home keeps
   the hero "Report waste" button as its contextual CTA. Do not add FABs, header buttons or
   empty-state buttons that duplicate it.
