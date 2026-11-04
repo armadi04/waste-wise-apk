@@ -31,8 +31,8 @@ Brand artwork comes from `waste-wise-web/frontend`:
 - App icon, adaptive icon, monochrome icon, and splash are generated from
   `public/favicon_io/android-chrome-512x512.png`.
 - In-app logo is generated from the same source.
-- Login backgrounds are `src/assets/images/login-day.webp` and
-  `src/assets/images/login-night.webp`.
+- The auth hero uses a theme-aware SVG pattern in
+  `src/components/auth/auth-hero.tsx`.
 - Empty and not-found animations are `src/assets/lottie/empty.json` and
   `src/assets/lottie/404.json`.
 
@@ -91,6 +91,8 @@ Recommended URLs:
 | Production | `https://your-api-domain.com/api/v1` |
 
 Cleartext HTTP is enabled for development/preview builds only. Production builds must use HTTPS.
+`preview` and `production` builds fail early when `EXPO_PUBLIC_API_URL` or
+`EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` is missing.
 
 ## Run
 
@@ -128,7 +130,8 @@ The `preview` profile produces an installable APK. The `production` profile prod
 ```bash
 bun run typecheck
 bun run lint
-bun test
+bun run format:check
+bun run test
 bunx --bun expo-doctor
 bun run export:android
 ```
@@ -162,8 +165,8 @@ AI classification runs inside NestJS when the report is created. Mobile never ca
 
 ## Behaviour
 
-- Login is Google-only. New Google accounts are registered automatically by NestJS.
-- Access tokens last 15 minutes; refresh rotates the token pair. A failed refresh clears the session.
+- Login is Google-only on one auth screen. New Google accounts are registered automatically by NestJS.
+- Access tokens last 15 minutes; refresh rotates the token pair. An invalid or expired refresh token clears the session. Transient network failures keep the session and show a retry screen.
 - A report requires a photo, GPS coordinates, and a 3–2000 character description.
 - Photos are compressed client-side to JPEG below 5 MB before upload.
 - Create report is two steps: upload media, then create the report. Retrying after a failed create reuses the uploaded media ID.

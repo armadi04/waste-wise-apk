@@ -198,6 +198,11 @@ supports them. Long list rows use truncation plus accessible full content where 
 - Forms own values through React Hook Form and Zod; modal stores own open and selection state
   only.
 - Use native modals and sheets with labeled controls and accessible dismissal.
+- Auth uses one screen and one Google CTA. New accounts are created automatically, so do not
+  add a separate register form or a login/register toggle. Show loading text on the CTA and
+  announce errors through a live region.
+- When a stored session cannot be restored because of a transient failure, keep the tokens and
+  show a retry screen; clear tokens only for an invalid or expired session.
 - Confirm destructive actions, retain drafts on API failure and surface actionable errors.
 - Permission gates apply to navigation and actions; never imply a UI gate authorizes API
   access.
