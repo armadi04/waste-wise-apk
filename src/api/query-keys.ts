@@ -8,6 +8,12 @@ export const queryKeys = {
   stats: {
     reports: ['stats', 'reports'] as const,
   },
+  notifications: {
+    all: ['notifications'] as const,
+    list: ['notifications', 'list'] as const,
+    unread: ['notifications', 'unread'] as const,
+  },
+  changelog: ['changelog'] as const,
   reports: {
     all: ['reports'] as const,
     list: (
