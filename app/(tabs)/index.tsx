@@ -72,7 +72,9 @@ export default function DashboardScreen() {
         />
       ) : (
         <>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md }}>
+          <View
+            style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md }}
+          >
             <StatCard
               label="Total Reports"
               value={stats.data?.total ?? 0}

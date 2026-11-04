@@ -6,7 +6,13 @@ import { useRouter } from 'expo-router';
 import { Camera, ImagePlus, MapPin, RefreshCw, X } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ActivityIndicator, Alert, Linking, Pressable, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  Linking,
+  Pressable,
+  View,
+} from 'react-native';
 
 import { uploadMedia, type UploadFile } from '@/api/media.api';
 import { errorMessage } from '@/api/errors';
@@ -33,7 +39,8 @@ const LOCATION_TIMEOUT_MS = 15_000;
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const timeout = setTimeout(
-      () => reject(new Error('Could not get your location in time. Try again.')),
+      () =>
+        reject(new Error('Could not get your location in time. Try again.')),
       ms,
     );
     promise.then(
@@ -130,7 +137,9 @@ export default function CreateReportScreen() {
       setPhoto(null);
       setPreparedPhoto(null);
       setPhotoError(
-        error instanceof Error ? error.message : 'This photo could not be used.',
+        error instanceof Error
+          ? error.message
+          : 'This photo could not be used.',
       );
     } finally {
       setPreparingPhoto(false);
@@ -190,7 +199,9 @@ export default function CreateReportScreen() {
     setSubmitError(null);
 
     if (!location) {
-      setSubmitError('A GPS location is required before submitting the report.');
+      setSubmitError(
+        'A GPS location is required before submitting the report.',
+      );
       return;
     }
     if (!photo || !preparedPhoto) {
@@ -240,8 +251,8 @@ export default function CreateReportScreen() {
       <Card style={{ gap: spacing.md }}>
         <SectionHeader title="1. Photo" />
         <AppText color={colors.mutedForeground}>
-          Take a photo or choose one from your gallery. JPEG, PNG, or WebP, up to
-          5 MB after compression.
+          Take a photo or choose one from your gallery. JPEG, PNG, or WebP, up
+          to 5 MB after compression.
         </AppText>
 
         {photo ? (
@@ -313,7 +324,9 @@ export default function CreateReportScreen() {
             ) : (
               <>
                 <ImagePlus size={30} color={colors.mutedForeground} />
-                <AppText color={colors.mutedForeground}>No photo selected</AppText>
+                <AppText color={colors.mutedForeground}>
+                  No photo selected
+                </AppText>
               </>
             )}
           </View>
@@ -345,17 +358,34 @@ export default function CreateReportScreen() {
       <Card style={{ gap: spacing.md }}>
         <SectionHeader title="2. Location" />
         {locationState === 'loading' ? (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing.sm,
+            }}
+          >
             <ActivityIndicator color={colors.primary} />
-            <AppText color={colors.mutedForeground}>Getting your GPS location…</AppText>
+            <AppText color={colors.mutedForeground}>
+              Getting your GPS location…
+            </AppText>
           </View>
         ) : location ? (
           <View style={{ gap: spacing.xs }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: spacing.sm,
+              }}
+            >
               <MapPin size={18} color={colors.success} />
               <AppText weight="semibold">Location captured</AppText>
             </View>
-            <AppText color={colors.mutedForeground} style={{ fontVariant: ['tabular-nums'] }}>
+            <AppText
+              color={colors.mutedForeground}
+              style={{ fontVariant: ['tabular-nums'] }}
+            >
               {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}
             </AppText>
           </View>
@@ -427,7 +457,13 @@ export default function CreateReportScreen() {
 
       {busy ? (
         <Card style={{ gap: spacing.sm }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing.sm,
+            }}
+          >
             <ActivityIndicator color={colors.primary} />
             <AppText weight="semibold">
               {submitStage === 'uploading'
@@ -438,7 +474,8 @@ export default function CreateReportScreen() {
             </AppText>
           </View>
           <AppText variant="caption" color={colors.mutedForeground}>
-            Keep this screen open. Do not submit again until the process finishes.
+            Keep this screen open. Do not submit again until the process
+            finishes.
           </AppText>
         </Card>
       ) : null}
@@ -451,7 +488,11 @@ export default function CreateReportScreen() {
         onPress={() => void submit()}
       />
 
-      <AppText variant="caption" color={colors.mutedForeground} style={{ textAlign: 'center' }}>
+      <AppText
+        variant="caption"
+        color={colors.mutedForeground}
+        style={{ textAlign: 'center' }}
+      >
         AI classification runs automatically when you submit. Your report starts
         as Pending.
       </AppText>

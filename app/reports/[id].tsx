@@ -4,7 +4,12 @@ import { CalendarClock, ImageOff, MapPin, Sparkles } from 'lucide-react-native';
 import { RefreshControl, View } from 'react-native';
 
 import { errorMessage } from '@/api/errors';
-import { CategoryBadge, ClassificationStatusBadge, ConfidenceText, ReportStatusBadge } from '@/components/reports/report-badges';
+import {
+  CategoryBadge,
+  ClassificationStatusBadge,
+  ConfidenceText,
+  ReportStatusBadge,
+} from '@/components/reports/report-badges';
 import { Card } from '@/components/ui/card';
 import { Screen, ScreenHeader } from '@/components/ui/layout';
 import { ErrorState, LoadingState } from '@/components/ui/states';
@@ -83,15 +88,29 @@ export default function ReportDetailScreen() {
                 transition={150}
               />
             ) : (
-              <View style={{ alignItems: 'center', gap: spacing.sm, padding: spacing.xl }}>
+              <View
+                style={{
+                  alignItems: 'center',
+                  gap: spacing.sm,
+                  padding: spacing.xl,
+                }}
+              >
                 <ImageOff size={30} color={colors.mutedForeground} />
-                <AppText color={colors.mutedForeground}>Photo unavailable</AppText>
+                <AppText color={colors.mutedForeground}>
+                  Photo unavailable
+                </AppText>
               </View>
             )}
           </View>
 
           <Card style={{ gap: spacing.md }}>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                gap: spacing.sm,
+              }}
+            >
               <ReportStatusBadge status={report.status} />
               <CategoryBadge category={report.predictedCategory} />
             </View>
@@ -102,11 +121,23 @@ export default function ReportDetailScreen() {
           </Card>
 
           <Card style={{ gap: spacing.md }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: spacing.sm,
+              }}
+            >
               <Sparkles size={18} color={colors.primary} />
               <AppText variant="cardTitle">AI classification</AppText>
             </View>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                gap: spacing.sm,
+              }}
+            >
               <CategoryBadge category={report.predictedCategory} />
               <ClassificationStatusBadge status={report.classificationStatus} />
             </View>
@@ -121,7 +152,9 @@ export default function ReportDetailScreen() {
                 <AppText variant="caption" color={colors.mutedForeground}>
                   Model version
                 </AppText>
-                <AppText weight="semibold">{report.modelVersion || '—'}</AppText>
+                <AppText weight="semibold">
+                  {report.modelVersion || '—'}
+                </AppText>
               </View>
             </View>
             {report.classificationStatus === 'FAILED' ? (
@@ -135,7 +168,9 @@ export default function ReportDetailScreen() {
                 }}
               >
                 <AppText color={colors.warningForeground}>
-                  {CLASSIFICATION_ERROR_LABEL[report.classificationError ?? ''] ||
+                  {CLASSIFICATION_ERROR_LABEL[
+                    report.classificationError ?? ''
+                  ] ||
                     'AI classification failed. No category or confidence was stored.'}
                 </AppText>
               </View>
@@ -145,7 +180,11 @@ export default function ReportDetailScreen() {
           <Card style={{ gap: spacing.md }}>
             <AppText variant="cardTitle">Details</AppText>
             <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-              <MapPin size={17} color={colors.mutedForeground} style={{ marginTop: 2 }} />
+              <MapPin
+                size={17}
+                color={colors.mutedForeground}
+                style={{ marginTop: 2 }}
+              />
               <View style={{ flex: 1, gap: 2 }}>
                 <AppText variant="caption" color={colors.mutedForeground}>
                   Location
@@ -158,7 +197,11 @@ export default function ReportDetailScreen() {
               </View>
             </View>
             <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-              <CalendarClock size={17} color={colors.mutedForeground} style={{ marginTop: 2 }} />
+              <CalendarClock
+                size={17}
+                color={colors.mutedForeground}
+                style={{ marginTop: 2 }}
+              />
               <View style={{ flex: 1, gap: 2 }}>
                 <AppText variant="caption" color={colors.mutedForeground}>
                   Created

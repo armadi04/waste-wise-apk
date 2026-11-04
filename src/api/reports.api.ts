@@ -38,7 +38,9 @@ export async function createReport(input: CreateReportInput): Promise<Report> {
   return data;
 }
 
-export async function getReportStats(): Promise<import('@/types/domain').ReportStats> {
+export async function getReportStats(): Promise<
+  import('@/types/domain').ReportStats
+> {
   const { data } = await api.get('/stats/reports');
   return data;
 }

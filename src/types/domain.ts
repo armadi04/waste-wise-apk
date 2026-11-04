@@ -26,8 +26,7 @@ export interface AuthSession {
 }
 
 export type MobileGoogleLoginResponse =
-  | AuthSession
-  | { twoFactorRequired: true; challengeToken: string };
+  AuthSession | { twoFactorRequired: true; challengeToken: string };
 
 export interface ReportListParams {
   page: number;

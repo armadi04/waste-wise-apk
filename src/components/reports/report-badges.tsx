@@ -15,12 +15,26 @@ import type {
 } from '@/types/domain';
 
 export function ReportStatusBadge({ status }: { status: ReportStatus }) {
-  return <Badge label={REPORT_STATUS_LABEL[status]} tone={REPORT_STATUS_TONE[status]} />;
+  return (
+    <Badge
+      label={REPORT_STATUS_LABEL[status]}
+      tone={REPORT_STATUS_TONE[status]}
+    />
+  );
 }
 
-export function CategoryBadge({ category }: { category: WasteCategory | null }) {
+export function CategoryBadge({
+  category,
+}: {
+  category: WasteCategory | null;
+}) {
   if (!category) return <Badge label="Not classified" />;
-  return <Badge label={WASTE_CATEGORY_LABEL[category]} tone={WASTE_CATEGORY_TONE[category]} />;
+  return (
+    <Badge
+      label={WASTE_CATEGORY_LABEL[category]}
+      tone={WASTE_CATEGORY_TONE[category]}
+    />
+  );
 }
 
 export function ClassificationStatusBadge({
@@ -39,6 +53,7 @@ export function ClassificationStatusBadge({
 
 export function ConfidenceText({ value }: { value: number | null }) {
   const { colors } = useTheme();
-  if (value === null) return <AppText color={colors.mutedForeground}>—</AppText>;
+  if (value === null)
+    return <AppText color={colors.mutedForeground}>—</AppText>;
   return <AppText weight="semibold">{(value * 100).toFixed(1)}%</AppText>;
 }

@@ -6,7 +6,12 @@ import { useAuth } from '@/auth/auth-provider';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Divider, Screen, ScreenHeader, SectionHeader } from '@/components/ui/layout';
+import {
+  Divider,
+  Screen,
+  ScreenHeader,
+  SectionHeader,
+} from '@/components/ui/layout';
 import { Segmented } from '@/components/ui/segmented';
 import { AppText } from '@/components/ui/text';
 import { useTheme } from '@/theme';
@@ -64,7 +69,13 @@ export default function ProfileScreen() {
       />
 
       <Card style={{ gap: spacing.lg }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.lg }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: spacing.lg,
+          }}
+        >
           <Avatar media={user?.avatar} name={user?.fullname} size={72} />
           <View style={{ flex: 1, gap: spacing.xs }}>
             <AppText variant="sectionTitle">
@@ -81,14 +92,24 @@ export default function ProfileScreen() {
                 backgroundColor: colors.selectedBackground,
               }}
             >
-              <AppText variant="caption" color={colors.selectedForeground} weight="semibold">
+              <AppText
+                variant="caption"
+                color={colors.selectedForeground}
+                weight="semibold"
+              >
                 {role}
               </AppText>
             </View>
           </View>
         </View>
         <Divider />
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: spacing.sm,
+          }}
+        >
           <ShieldCheck size={18} color={colors.success} />
           <AppText color={colors.mutedForeground}>
             Signed in with Google · account managed by WasteWise backend

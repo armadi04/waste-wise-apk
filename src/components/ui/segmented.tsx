@@ -23,7 +23,10 @@ export function Segmented<T extends string>({
   const { colors, radius, spacing } = useTheme();
 
   const content = (
-    <Pressable style={{ flexDirection: 'row', gap: spacing.sm }} accessibilityRole="tablist">
+    <Pressable
+      style={{ flexDirection: 'row', gap: spacing.sm }}
+      accessibilityRole="tablist"
+    >
       {options.map((option) => {
         const active = option.value === value;
         return (
@@ -39,12 +42,16 @@ export function Segmented<T extends string>({
               borderRadius: radius.pill,
               borderWidth: 1,
               borderColor: active ? colors.selectedBorder : colors.borderSubtle,
-              backgroundColor: active ? colors.selectedBackground : colors.surface,
+              backgroundColor: active
+                ? colors.selectedBackground
+                : colors.surface,
             }}
           >
             <AppText
               variant="label"
-              color={active ? colors.selectedForeground : colors.mutedForeground}
+              color={
+                active ? colors.selectedForeground : colors.mutedForeground
+              }
               weight={active ? 'semibold' : 'medium'}
             >
               {option.label}

@@ -18,18 +18,50 @@ export function StatCard({
 }) {
   const { colors, spacing, radius } = useTheme();
   const tones: Record<Tone, { bg: string; fg: string; border: string }> = {
-    default: { bg: colors.muted, fg: colors.foreground, border: colors.borderSubtle },
-    info: { bg: colors.infoBackground, fg: colors.infoForeground, border: colors.infoBorder },
-    success: { bg: colors.successBackground, fg: colors.successForeground, border: colors.successBorder },
-    warning: { bg: colors.warningBackground, fg: colors.warningForeground, border: colors.warningBorder },
-    danger: { bg: colors.dangerBackground, fg: colors.dangerForeground, border: colors.dangerBorder },
+    default: {
+      bg: colors.muted,
+      fg: colors.foreground,
+      border: colors.borderSubtle,
+    },
+    info: {
+      bg: colors.infoBackground,
+      fg: colors.infoForeground,
+      border: colors.infoBorder,
+    },
+    success: {
+      bg: colors.successBackground,
+      fg: colors.successForeground,
+      border: colors.successBorder,
+    },
+    warning: {
+      bg: colors.warningBackground,
+      fg: colors.warningForeground,
+      border: colors.warningBorder,
+    },
+    danger: {
+      bg: colors.dangerBackground,
+      fg: colors.dangerForeground,
+      border: colors.dangerBorder,
+    },
   };
   const current = tones[tone];
 
   return (
-    <Card style={{ flex: 1, minWidth: 150, gap: spacing.sm, padding: spacing.md }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <AppText variant="caption" color={colors.mutedForeground} style={{ flex: 1 }}>
+    <Card
+      style={{ flex: 1, minWidth: 150, gap: spacing.sm, padding: spacing.md }}
+    >
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <AppText
+          variant="caption"
+          color={colors.mutedForeground}
+          style={{ flex: 1 }}
+        >
           {label}
         </AppText>
         {icon ? (

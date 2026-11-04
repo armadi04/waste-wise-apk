@@ -9,7 +9,14 @@ import { AppText } from './text';
 export function LoadingState({ label = 'Loading…' }: { label?: string }) {
   const { colors, spacing } = useTheme();
   return (
-    <View style={{ alignItems: 'center', justifyContent: 'center', padding: spacing.xxxl, gap: spacing.md }}>
+    <View
+      style={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: spacing.xxxl,
+        gap: spacing.md,
+      }}
+    >
       <ActivityIndicator color={colors.primary} size="large" />
       <AppText color={colors.mutedForeground}>{label}</AppText>
     </View>
@@ -56,7 +63,11 @@ export function EmptyState({
         {description}
       </AppText>
       {actionLabel && onAction ? (
-        <Button label={actionLabel} onPress={onAction} style={{ marginTop: spacing.sm }} />
+        <Button
+          label={actionLabel}
+          onPress={onAction}
+          style={{ marginTop: spacing.sm }}
+        />
       ) : null}
     </View>
   );
@@ -85,7 +96,9 @@ export function ErrorState({
         Something went wrong
       </AppText>
       <AppText color={colors.dangerForeground}>{message}</AppText>
-      {onRetry ? <Button label="Try again" variant="outline" onPress={onRetry} /> : null}
+      {onRetry ? (
+        <Button label="Try again" variant="outline" onPress={onRetry} />
+      ) : null}
     </View>
   );
 }

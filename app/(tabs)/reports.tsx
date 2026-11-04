@@ -1,7 +1,12 @@
 import { useRouter } from 'expo-router';
 import { Plus } from 'lucide-react-native';
 import { useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  View,
+} from 'react-native';
 
 import { errorMessage } from '@/api/errors';
 import { ReportListItem } from '@/components/reports/report-list-item';
@@ -28,7 +33,13 @@ export default function ReportsScreen() {
 
   return (
     <Screen contentContainerStyle={{ padding: 0 }}>
-      <View style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.lg, gap: spacing.md }}>
+      <View
+        style={{
+          paddingHorizontal: spacing.lg,
+          paddingTop: spacing.lg,
+          gap: spacing.md,
+        }}
+      >
         <ScreenHeader
           title="My Reports"
           subtitle="Every report you have submitted."
