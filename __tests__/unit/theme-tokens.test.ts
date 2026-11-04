@@ -45,5 +45,17 @@ describe('theme tokens', () => {
         expect(contrast(fg, bg)).toBeGreaterThanOrEqual(4.5);
       }
     });
+
+    it(`keeps the Google button readable in ${mode} mode`, () => {
+      expect(
+        contrast(colors.googleButtonForeground, colors.googleButtonBackground),
+      ).toBeGreaterThanOrEqual(4.5);
+      expect(
+        contrast(colors.googleButtonForeground, colors.googleButtonPressed),
+      ).toBeGreaterThanOrEqual(4.5);
+      expect(
+        contrast(colors.googleButtonBorder, colors.surface),
+      ).toBeGreaterThanOrEqual(3);
+    });
   }
 });

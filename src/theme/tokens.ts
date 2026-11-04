@@ -70,6 +70,10 @@ export interface ThemeColors {
   infoSolidPressed: string;
   infoSolidForeground: string;
   scrim: string;
+  googleButtonBackground: string;
+  googleButtonPressed: string;
+  googleButtonBorder: string;
+  googleButtonForeground: string;
   progress: string;
   progressBackground: string;
   progressForeground: string;
@@ -150,6 +154,10 @@ export const lightColors: ThemeColors = {
   infoSolidHover: '#115E59',
   infoSolidPressed: '#134E4A',
   infoSolidForeground: '#FFFFFF',
+  googleButtonBackground: '#FFFFFF',
+  googleButtonPressed: '#F2F2F2',
+  googleButtonBorder: '#747775',
+  googleButtonForeground: '#1F1F1F',
   scrim: 'rgba(9, 9, 11, 0.55)',
   progress: '#1D4ED8',
   progressBackground: '#EFF6FF',
@@ -231,6 +239,10 @@ export const darkColors: ThemeColors = {
   infoSolidHover: '#115E59',
   infoSolidPressed: '#134E4A',
   infoSolidForeground: '#FFFFFF',
+  googleButtonBackground: '#131314',
+  googleButtonPressed: '#2A2A2C',
+  googleButtonBorder: '#8E918F',
+  googleButtonForeground: '#E3E3E3',
   scrim: 'rgba(0, 0, 0, 0.72)',
   progress: '#60A5FA',
   progressBackground: '#172554',
