@@ -58,12 +58,12 @@ function RootNavigator() {
           animation: 'slide_from_right',
         }}
       >
-        <Stack.Protected guard={status === 'authenticated'}>
+        <Stack.Protected guard={status === 'authenticated'} redirectTo="/login">
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="reports/create" />
           <Stack.Screen name="reports/[id]" />
         </Stack.Protected>
-        <Stack.Protected guard={status !== 'authenticated'} redirectTo="/login">
+        <Stack.Protected guard={status !== 'authenticated'}>
           <Stack.Screen name="(auth)" />
         </Stack.Protected>
       </Stack>
