@@ -21,3 +21,14 @@ export function formatCoordinate(value: number | null | undefined): string {
     return '—';
   return value.toFixed(6);
 }
+
+export function greeting(date: Date = new Date()): string {
+  const hour = date.getHours();
+  if (hour >= 5 && hour < 12) return 'Good morning';
+  if (hour >= 12 && hour < 18) return 'Good afternoon';
+  return 'Good evening';
+}
+
+export function capitalize(value: string): string {
+  return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
+}
