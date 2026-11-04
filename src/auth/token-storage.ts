@@ -12,6 +12,12 @@ const EXPIRES_KEY = 'wastewise.session-expires-at';
 
 let cache: AuthTokens | null | undefined;
 
+function warnDevelopment(message: string): void {
+  if (typeof __DEV__ !== 'undefined' && __DEV__) {
+    console.warn(message);
+  }
+}
+
 async function read(key: string): Promise<string | null> {
   try {
     return await SecureStore.getItemAsync(key);
@@ -24,7 +30,7 @@ async function write(key: string, value: string): Promise<void> {
   try {
     await SecureStore.setItemAsync(key, value);
   } catch {
-    // Secure storage can be unavailable on unsupported platforms.
+    warnDevelopment(`Secure storage could not persist ${key}.`);
   }
 }
 

@@ -5,31 +5,43 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type PropsWithChildren,
 } from 'react';
 
-import { isErrorWithCode, statusCodes } from '@react-native-google-signin/google-signin';
-
 import {
-  getProfile,
-  googleMobileLogin,
-  logoutMobile,
-} from '@/api/auth.api';
+  isErrorWithCode,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
+
+import { getProfile, googleMobileLogin, logoutMobile } from '@/api/auth.api';
 import { setUnauthorizedHandler } from '@/api/client';
-import { errorMessage } from '@/api/errors';
 import { queryKeys } from '@/api/query-keys';
+import {
+  authFailure,
+  toAuthFailure,
+  type AuthFailure,
+} from '@/auth/auth-error';
 import { clearTokens, loadTokens, saveTokens } from '@/auth/token-storage';
 import type { AuthSession, User } from '@/types/domain';
-import { requestGoogleIdToken, signOutFromGoogle } from './google-signin';
 
-type AuthStatus = 'loading' | 'authenticated' | 'guest';
+import { requestGoogleIdToken, signOutFromGoogle } from './google-signin';
+import { restoreSession } from './session-restore';
+
+type AuthStatus = 'loading' | 'guest' | 'authenticated' | 'restore-error';
+
+export type GoogleSignInResult =
+  | { status: 'success' }
+  | { status: 'cancelled' }
+  | { status: 'error'; error: AuthFailure };
 
 interface AuthContextValue {
   status: AuthStatus;
   user: User | null;
   isSigningIn: boolean;
-  signInWithGoogle: () => Promise<{ cancelled: boolean }>;
+  signInWithGoogle: () => Promise<GoogleSignInResult>;
+  retrySessionRestore: () => Promise<void>;
   signOut: () => Promise<void>;
   reloadProfile: () => Promise<void>;
 }
@@ -41,41 +53,77 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [status, setStatus] = useState<AuthStatus>('loading');
   const [user, setUser] = useState<User | null>(null);
   const [isSigningIn, setIsSigningIn] = useState(false);
+  const signingInRef = useRef(false);
+
+  const applyAuthenticated = useCallback(
+    (profile: User) => {
+      setUser(profile);
+      setStatus('authenticated');
+      queryClient.setQueryData(queryKeys.auth.profile, profile);
+    },
+    [queryClient],
+  );
 
   const loadProfile = useCallback(async () => {
     const profile = await getProfile();
-    setUser(profile);
-    setStatus('authenticated');
-    queryClient.setQueryData(queryKeys.auth.profile, profile);
+    applyAuthenticated(profile);
     return profile;
-  }, [queryClient]);
+  }, [applyAuthenticated]);
+
+  const applyRestoreResult = useCallback(
+    (result: Awaited<ReturnType<typeof restoreSession>>): void => {
+      if (result.status === 'authenticated') {
+        applyAuthenticated(result.profile);
+        return;
+      }
+      if (result.status === 'guest') {
+        setUser(null);
+        setStatus('guest');
+        return;
+      }
+      setUser(null);
+      setStatus('restore-error');
+    },
+    [applyAuthenticated],
+  );
+
+  const restore = useCallback(async () => {
+    try {
+      const result = await restoreSession({
+        loadTokens,
+        getProfile,
+        clearTokens,
+      });
+      applyRestoreResult(result);
+    } catch {
+      setUser(null);
+      setStatus('restore-error');
+    }
+  }, [applyRestoreResult]);
 
   useEffect(() => {
     let active = true;
+
     (async () => {
-      const tokens = await loadTokens();
-      if (!tokens) {
-        if (active) setStatus('guest');
-        return;
-      }
       try {
-        const profile = await getProfile();
-        if (!active) return;
-        setUser(profile);
-        setStatus('authenticated');
-        queryClient.setQueryData(queryKeys.auth.profile, profile);
+        const result = await restoreSession({
+          loadTokens,
+          getProfile,
+          clearTokens,
+        });
+        if (active) applyRestoreResult(result);
       } catch {
-        await clearTokens();
         if (active) {
           setUser(null);
-          setStatus('guest');
+          setStatus('restore-error');
         }
       }
     })();
+
     return () => {
       active = false;
     };
-  }, [queryClient]);
+  }, [applyRestoreResult]);
 
   useEffect(() => {
     setUnauthorizedHandler(async () => {
@@ -87,46 +135,51 @@ export function AuthProvider({ children }: PropsWithChildren) {
     return () => setUnauthorizedHandler(null);
   }, [queryClient]);
 
-  const signInWithGoogle = useCallback(async () => {
-    setIsSigningIn(true);
-    try {
-      const idToken = await requestGoogleIdToken();
-      if (!idToken) {
-        return { cancelled: true };
+  const signInWithGoogle =
+    useCallback(async (): Promise<GoogleSignInResult> => {
+      if (signingInRef.current) {
+        return { status: 'error', error: authFailure('unknown') };
       }
 
-      const result = await googleMobileLogin(idToken);
-      if ('twoFactorRequired' in result) {
-        throw new Error(
-          'This account uses two-factor authentication. Complete verification in the web app, then try again.',
-        );
-      }
+      signingInRef.current = true;
+      setIsSigningIn(true);
 
-      const session: AuthSession = result;
-      await saveTokens(session);
-      await loadProfile();
-      await queryClient.invalidateQueries();
-      return { cancelled: false };
-    } catch (error) {
-      if (
-        isErrorWithCode(error) &&
-        error.code === statusCodes.SIGN_IN_CANCELLED
-      ) {
-        return { cancelled: true };
+      try {
+        const idToken = await requestGoogleIdToken();
+        if (!idToken) {
+          return { status: 'cancelled' };
+        }
+
+        const result = await googleMobileLogin(idToken);
+        if ('twoFactorRequired' in result) {
+          return {
+            status: 'error',
+            error: authFailure('two_factor_required'),
+          };
+        }
+
+        const session: AuthSession = result;
+        await saveTokens(session);
+        await loadProfile();
+        await queryClient.invalidateQueries();
+        return { status: 'success' };
+      } catch (error) {
+        if (
+          isErrorWithCode(error) &&
+          error.code === statusCodes.SIGN_IN_CANCELLED
+        ) {
+          return { status: 'cancelled' };
+        }
+        return { status: 'error', error: toAuthFailure(error) };
+      } finally {
+        signingInRef.current = false;
+        setIsSigningIn(false);
       }
-      if (
-        isErrorWithCode(error) &&
-        error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE
-      ) {
-        throw new Error(
-          'Google Play Services is unavailable or needs an update.',
-        );
-      }
-      throw new Error(errorMessage(error));
-    } finally {
-      setIsSigningIn(false);
-    }
-  }, [loadProfile, queryClient]);
+    }, [loadProfile, queryClient]);
+
+  const retrySessionRestore = useCallback(async () => {
+    await restore();
+  }, [restore]);
 
   const signOut = useCallback(async () => {
     const tokens = await loadTokens();
@@ -155,10 +208,19 @@ export function AuthProvider({ children }: PropsWithChildren) {
       user,
       isSigningIn,
       signInWithGoogle,
+      retrySessionRestore,
       signOut,
       reloadProfile,
     }),
-    [isSigningIn, reloadProfile, signInWithGoogle, signOut, status, user],
+    [
+      isSigningIn,
+      reloadProfile,
+      retrySessionRestore,
+      signInWithGoogle,
+      signOut,
+      status,
+      user,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

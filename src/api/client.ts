@@ -4,17 +4,25 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios';
 
-import { clearTokens, getCachedAccessToken, loadTokens, saveTokens } from '@/auth/token-storage';
+import {
+  clearTokens,
+  getCachedAccessToken,
+  loadTokens,
+  saveTokens,
+} from '@/auth/token-storage';
 import { API_BASE_URL } from '@/lib/config';
 
 import { ApiError, toApiError } from './errors';
+import { isInvalidSessionError } from './session';
 
 type UnauthorizedHandler = () => void | Promise<void>;
 
 let unauthorizedHandler: UnauthorizedHandler | null = null;
 let refreshing: Promise<string> | null = null;
 
-export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): void {
+export function setUnauthorizedHandler(
+  handler: UnauthorizedHandler | null,
+): void {
   unauthorizedHandler = handler;
 }
 
@@ -61,7 +69,8 @@ const api = createAxios({
 });
 
 api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
-  const accessToken = getCachedAccessToken() ?? (await loadTokens())?.accessToken;
+  const accessToken =
+    getCachedAccessToken() ?? (await loadTokens())?.accessToken;
   if (accessToken) {
     config.headers.set('Authorization', `Bearer ${accessToken}`);
   }
@@ -73,8 +82,7 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const status = error.response?.status;
     const original = error.config as
-      | (InternalAxiosRequestConfig & { _retry?: boolean })
-      | undefined;
+      (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
     const url = original?.url ?? '';
     const isAuthRoute =
       url.includes('/auth/mobile/refresh') ||
@@ -87,12 +95,19 @@ api.interceptors.response.use(
         const accessToken = await refreshAccessToken();
         original.headers.set('Authorization', `Bearer ${accessToken}`);
         return api(original);
-      } catch {
-        await clearTokens();
-        await unauthorizedHandler?.();
-        return Promise.reject(
-          new ApiError('Your session has expired. Please sign in again.', 401, 'UNAUTHORIZED'),
-        );
+      } catch (refreshError) {
+        if (isInvalidSessionError(refreshError)) {
+          await clearTokens();
+          await unauthorizedHandler?.();
+          return Promise.reject(
+            new ApiError(
+              'Your session has expired. Please sign in again.',
+              401,
+              'UNAUTHORIZED',
+            ),
+          );
+        }
+        return Promise.reject(toApiError(refreshError));
       }
     }
 

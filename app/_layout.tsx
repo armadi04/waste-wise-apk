@@ -11,12 +11,13 @@ import { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider, useAuth } from '@/auth/auth-provider';
+import { SessionRecoveryScreen } from '@/auth/session-recovery-screen';
 import { ThemeProvider, useTheme } from '@/theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
 function RootNavigator() {
-  const { status } = useAuth();
+  const { status, retrySessionRestore, signOut } = useAuth();
   const { colors, mode, hydrated } = useTheme();
   const [fontsLoaded, fontError] = useFonts({
     PlusJakartaSans_400Regular,
@@ -24,13 +25,27 @@ function RootNavigator() {
     PlusJakartaSans_600SemiBold,
   });
 
-  const ready = hydrated && (fontsLoaded || !!fontError) && status !== 'loading';
+  const ready =
+    hydrated && (fontsLoaded || !!fontError) && status !== 'loading';
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync().catch(() => undefined);
   }, [ready]);
 
   if (!ready) return null;
+
+  if (status === 'restore-error') {
+    return (
+      <>
+        <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
+        <NavigationBar style={mode === 'dark' ? 'dark' : 'light'} />
+        <SessionRecoveryScreen
+          onRetry={retrySessionRestore}
+          onSignOut={signOut}
+        />
+      </>
+    );
+  }
 
   return (
     <>
