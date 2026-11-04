@@ -29,45 +29,45 @@ only. Every token must exist in both themes; never inherit a missing dark value 
 
 ### Surfaces, actions and inputs
 
-| Application token | Light | Dark |
-|---|---|---|
-| `background` | #FFFFFF | #000000 |
-| `surface` | #FFFFFF | #18181B |
-| `surface-hover` | #E4E4E7 | #3F3F46 |
-| `surface-pressed` | #D4D4D8 | #52525B |
-| `foreground` | #11181C | #ECEDEE |
-| `muted` | #F4F4F5 | #27272A |
-| `muted-foreground` | #52525B | #D4D4D8 |
-| `border-subtle` | #E4E4E7 | #3F3F46 |
-| `border-control` | #71717A | #A1A1AA |
-| `primary` | #0F766E | #0F766E |
-| `primary-hover` | #115E59 | #115E59 |
-| `primary-pressed` | #134E4A | #134E4A |
-| `primary-foreground` | #FFFFFF | #FFFFFF |
-| `link` | #0F766E | #5EEAD4 |
-| `link-hover` | #115E59 | #99F6E4 |
-| `selected-background` | #F0FDFA | #134E4A |
-| `selected-hover` | #CCFBF1 | #115E59 |
-| `selected-foreground` | #0F766E | #99F6E4 |
-| `selected-border` | #0D9488 | #2DD4BF |
-| `brand` | #0B4F5C | #0B4F5C |
-| `brand-pressed` | #083F49 | #083F49 |
-| `brand-foreground` | #FFFFFF | #FFFFFF |
+| Application token        | Light   | Dark    |
+| ------------------------ | ------- | ------- |
+| `background`             | #FFFFFF | #000000 |
+| `surface`                | #FFFFFF | #18181B |
+| `surface-hover`          | #E4E4E7 | #3F3F46 |
+| `surface-pressed`        | #D4D4D8 | #52525B |
+| `foreground`             | #11181C | #ECEDEE |
+| `muted`                  | #F4F4F5 | #27272A |
+| `muted-foreground`       | #52525B | #D4D4D8 |
+| `border-subtle`          | #E4E4E7 | #3F3F46 |
+| `border-control`         | #71717A | #A1A1AA |
+| `primary`                | #0F766E | #0F766E |
+| `primary-hover`          | #115E59 | #115E59 |
+| `primary-pressed`        | #134E4A | #134E4A |
+| `primary-foreground`     | #FFFFFF | #FFFFFF |
+| `link`                   | #0F766E | #5EEAD4 |
+| `link-hover`             | #115E59 | #99F6E4 |
+| `selected-background`    | #F0FDFA | #134E4A |
+| `selected-hover`         | #CCFBF1 | #115E59 |
+| `selected-foreground`    | #0F766E | #99F6E4 |
+| `selected-border`        | #0D9488 | #2DD4BF |
+| `brand`                  | #0B4F5C | #0B4F5C |
+| `brand-pressed`          | #083F49 | #083F49 |
+| `brand-foreground`       | #FFFFFF | #FFFFFF |
 | `brand-muted-foreground` | #D3DFE2 | #D3DFE2 |
-| `shadow` | #000000 | #000000 |
-| `focus` | #0D9488 | #5EEAD4 |
-| `focus-offset` | #FFFFFF | #18181B |
-| `disabled-background` | #F4F4F5 | #27272A |
-| `disabled-foreground` | #71717A | #A1A1AA |
-| `disabled-border` | #D4D4D8 | #52525B |
-| `input-background` | #FFFFFF | #18181B |
-| `input-foreground` | #11181C | #ECEDEE |
-| `input-placeholder` | #71717A | #A1A1AA |
-| `input-border` | #71717A | #A1A1AA |
-| `input-border-hover` | #3F3F46 | #D4D4D8 |
-| `input-border-focus` | #0D9488 | #5EEAD4 |
-| `input-border-error` | #B91C1C | #F87171 |
-| `accent` | #F3AA28 | #F3AA28 |
+| `shadow`                 | #000000 | #000000 |
+| `focus`                  | #0D9488 | #5EEAD4 |
+| `focus-offset`           | #FFFFFF | #18181B |
+| `disabled-background`    | #F4F4F5 | #27272A |
+| `disabled-foreground`    | #71717A | #A1A1AA |
+| `disabled-border`        | #D4D4D8 | #52525B |
+| `input-background`       | #FFFFFF | #18181B |
+| `input-foreground`       | #11181C | #ECEDEE |
+| `input-placeholder`      | #71717A | #A1A1AA |
+| `input-border`           | #71717A | #A1A1AA |
+| `input-border-hover`     | #3F3F46 | #D4D4D8 |
+| `input-border-focus`     | #0D9488 | #5EEAD4 |
+| `input-border-error`     | #B91C1C | #F87171 |
+| `accent`                 | #F3AA28 | #F3AA28 |
 
 `surface` is the background for cards, sheets, forms and navigation. `border-subtle` is
 only a decorative separator; interactive controls use `border-control` or `input-border`.
@@ -108,51 +108,53 @@ contrast. A bright dark-mode status text color must never become a solid button 
 with white text. Keep status meaning consistent and include a label or icon; never
 communicate status through color alone.
 
-| Application token | Light | Dark |
-|---|---|---|
-| `success` | #15803D | #4ADE80 |
-| `success-background` | #F0FDF4 | #14532D |
-| `success-foreground` | #166534 | #DCFCE7 |
-| `success-border` | #15803D | #4ADE80 |
-| `success-solid` | #15803D | #15803D |
-| `success-solid-hover` | #166534 | #166534 |
-| `success-solid-pressed` | #14532D | #14532D |
+| Application token          | Light   | Dark    |
+| -------------------------- | ------- | ------- |
+| `success`                  | #15803D | #4ADE80 |
+| `success-background`       | #F0FDF4 | #14532D |
+| `success-foreground`       | #166534 | #DCFCE7 |
+| `success-border`           | #15803D | #4ADE80 |
+| `success-solid`            | #15803D | #15803D |
+| `success-solid-hover`      | #166534 | #166534 |
+| `success-solid-pressed`    | #14532D | #14532D |
 | `success-solid-foreground` | #FFFFFF | #FFFFFF |
-| `warning` | #B45309 | #FBBF24 |
-| `warning-background` | #FFFBEB | #451A03 |
-| `warning-foreground` | #92400E | #FDE68A |
-| `warning-border` | #B45309 | #FBBF24 |
-| `warning-solid` | #B45309 | #B45309 |
-| `warning-solid-hover` | #92400E | #92400E |
-| `warning-solid-pressed` | #78350F | #78350F |
+| `warning`                  | #B45309 | #FBBF24 |
+| `warning-background`       | #FFFBEB | #451A03 |
+| `warning-foreground`       | #92400E | #FDE68A |
+| `warning-border`           | #B45309 | #FBBF24 |
+| `warning-solid`            | #B45309 | #B45309 |
+| `warning-solid-hover`      | #92400E | #92400E |
+| `warning-solid-pressed`    | #78350F | #78350F |
 | `warning-solid-foreground` | #FFFFFF | #FFFFFF |
-| `danger` | #B91C1C | #FCA5A5 |
-| `danger-background` | #FEF2F2 | #450A0A |
-| `danger-foreground` | #991B1B | #FECACA |
-| `danger-border` | #B91C1C | #F87171 |
-| `danger-solid` | #B91C1C | #B91C1C |
-| `danger-solid-hover` | #991B1B | #991B1B |
-| `danger-solid-pressed` | #7F1D1D | #7F1D1D |
-| `danger-solid-foreground` | #FFFFFF | #FFFFFF |
-| `info` | #0F766E | #5EEAD4 |
-| `info-background` | #F0FDFA | #134E4A |
-| `info-foreground` | #0F766E | #99F6E4 |
-| `info-border` | #0D9488 | #2DD4BF |
-| `info-solid` | #0F766E | #0F766E |
-| `info-solid-hover` | #115E59 | #115E59 |
-| `info-solid-pressed` | #134E4A | #134E4A |
-| `info-solid-foreground` | #FFFFFF | #FFFFFF |
+| `danger`                   | #B91C1C | #FCA5A5 |
+| `danger-background`        | #FEF2F2 | #450A0A |
+| `danger-foreground`        | #991B1B | #FECACA |
+| `danger-border`            | #B91C1C | #F87171 |
+| `danger-solid`             | #B91C1C | #B91C1C |
+| `danger-solid-hover`       | #991B1B | #991B1B |
+| `danger-solid-pressed`     | #7F1D1D | #7F1D1D |
+| `danger-solid-foreground`  | #FFFFFF | #FFFFFF |
+| `info`                     | #0F766E | #5EEAD4 |
+| `info-background`          | #F0FDFA | #134E4A |
+| `info-foreground`          | #0F766E | #99F6E4 |
+| `info-border`              | #0D9488 | #2DD4BF |
+| `info-solid`               | #0F766E | #0F766E |
+| `info-solid-hover`         | #115E59 | #115E59 |
+| `info-solid-pressed`       | #134E4A | #134E4A |
+| `info-solid-foreground`    | #FFFFFF | #FFFFFF |
 
 ### Component mapping
 
-| Mobile primitive | Color and state rule |
-|---|---|
-| `AppText` | `typography` role + `fontFamily`; defaults to `foreground` |
-| `Screen` | `background`, safe areas, optional scroll and refresh control |
-| `Card` | `surface`, `border-subtle` and `radius.lg` |
-| `Button` | Primary uses `primary` + `primary-foreground`; danger uses `danger-solid` + `danger-solid-foreground`; disabled uses disabled tokens |
-| `TextField` | Input tokens, focus ring, disabled tokens and inline error text |
-| `Segmented` | `selected-*` tokens plus weight and accessible selected state |
+| Mobile primitive        | Color and state rule                                                                                                                 |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `AppText`               | `typography` role + `fontFamily`; defaults to `foreground`                                                                           |
+| `Screen`                | `background`, safe areas, optional scroll and refresh control                                                                        |
+| `Card`                  | `surface`, `border-subtle` and `radius.lg`                                                                                           |
+| `Button`                | Primary uses `primary` + `primary-foreground`; danger uses `danger-solid` + `danger-solid-foreground`; disabled uses disabled tokens |
+| `TextField`             | Input tokens, focus ring, disabled tokens and inline error text                                                                      |
+| `Button` inverse        | `brandForeground` background + `brand` label; only on `brand` surfaces                                                               |
+| `Button` danger-outline | `danger` label and `dangerBorder`; pressed `dangerBackground`; for destructive actions that must not dominate                        |
+| `Segmented`             | `selected-*` tokens plus weight and accessible selected state                                                                        |
 
 Do not rely on opacity or inherited colors to approximate a token state. Use the explicit
 hover, pressed, selected, invalid and disabled tokens in the shared components.
@@ -175,15 +177,15 @@ hover, pressed, selected, invalid and disabled tokens in the shared components.
 Use **Plus Jakarta Sans** throughout the UI with a system sans-serif fallback. Use weights
 400, 500 and 600; avoid thin weights for operational data.
 
-| Element | Size | Weight |
-|---|---|---|
-| Display / auth hero | 30–32 px | 600 |
-| Page title | 24–28 px | 600 |
-| Section title | 18–20 px | 600 |
-| Card title | 16 px | 600 |
-| Body and form inputs | 14–16 px | 400 |
+| Element                        | Size     | Weight  |
+| ------------------------------ | -------- | ------- |
+| Display / auth hero            | 30–32 px | 600     |
+| Page title                     | 24–28 px | 600     |
+| Section title                  | 18–20 px | 600     |
+| Card title                     | 16 px    | 600     |
+| Body and form inputs           | 14–16 px | 400     |
 | Navigation, labels and buttons | 14–15 px | 500–600 |
-| Metadata and captions | 12–13 px | 400 |
+| Metadata and captions          | 12–13 px | 400     |
 
 Use a body line-height of 1.5 and a heading line-height of 1.25–1.3. Keep labels readable and
 hierarchy clear. Use tabular figures for amounts, quantities and dates where the platform
@@ -205,6 +207,12 @@ supports them. Long list rows use truncation plus accessible full content where 
   instead of stretching it to fill the screen; the hero absorbs remaining height. Use
   `surface` for the dock so dark mode does not render a pure black plane. Anchor the CTA at the
   bottom of the dock for thumb reach.
+- Tab screens own exactly one primary CTA: the brand hero button on Home and the
+  extended FAB on My Reports. Do not duplicate it in the header or empty state.
+- The Home hero uses the `brand` surface with `BrandBackdrop` and an `inverse` button.
+  Status rows deep-link to My Reports with a `status` param.
+- The tab bar adds the bottom safe-area inset to its height and uses `selected*` tokens
+  plus an active-indicator pill, so the active tab is not color-only.
 - When a stored session cannot be restored because of a transient failure, keep the tokens and
   show a retry screen; clear tokens only for an invalid or expired session.
 - Two-factor verification is a second auth step. Keep the challenge token in memory only, show a
