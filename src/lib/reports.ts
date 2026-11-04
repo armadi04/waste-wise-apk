@@ -1,7 +1,8 @@
 import type { ThemeColors } from '@/theme/tokens';
 import type { ReportFilter, ReportStatus, WasteCategory } from '@/types/domain';
 
-export type Tone = 'default' | 'info' | 'success' | 'warning' | 'danger';
+export type Tone =
+  'default' | 'info' | 'progress' | 'success' | 'warning' | 'danger';
 
 export const REPORT_STATUS_LABEL: Record<ReportStatus, string> = {
   PENDING: 'Pending',
@@ -12,7 +13,7 @@ export const REPORT_STATUS_LABEL: Record<ReportStatus, string> = {
 
 export const REPORT_STATUS_TONE: Record<ReportStatus, Tone> = {
   PENDING: 'warning',
-  IN_PROGRESS: 'info',
+  IN_PROGRESS: 'progress',
   COMPLETED: 'success',
   REJECTED: 'danger',
 };
@@ -78,6 +79,13 @@ export function toneColors(colors: ThemeColors, tone: Tone): ToneColors {
         fg: colors.infoForeground,
         border: colors.infoBorder,
         solid: colors.info,
+      };
+    case 'progress':
+      return {
+        bg: colors.progressBackground,
+        fg: colors.progressForeground,
+        border: colors.progressBorder,
+        solid: colors.progress,
       };
     case 'success':
       return {

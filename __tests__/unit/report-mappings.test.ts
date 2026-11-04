@@ -23,6 +23,7 @@ describe('report display mappings', () => {
     }
     expect(REPORT_STATUS_TONE.PENDING).toBe('warning');
     expect(REPORT_STATUS_TONE.COMPLETED).toBe('success');
+    expect(REPORT_STATUS_TONE.IN_PROGRESS).toBe('progress');
   });
 
   it('has labels and tones for every waste category', () => {

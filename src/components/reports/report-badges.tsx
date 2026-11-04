@@ -19,6 +19,7 @@ export function ReportStatusBadge({ status }: { status: ReportStatus }) {
     <Badge
       label={REPORT_STATUS_LABEL[status]}
       tone={REPORT_STATUS_TONE[status]}
+      dot
     />
   );
 }
