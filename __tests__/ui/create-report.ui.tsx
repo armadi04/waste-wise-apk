@@ -182,4 +182,18 @@ describe('create report screen', () => {
     );
     expect(media.uploadMedia).toHaveBeenCalledTimes(1);
   });
+
+  it('explains a denied camera permission in a dialog', async () => {
+    picker.requestCameraPermissionsAsync!.mockResolvedValue({ granted: false });
+    await render(<CreateReportScreen />);
+    await screen.findByText('Location captured');
+
+    await fireEvent.press(screen.getByLabelText('Take photo'));
+    expect(await screen.findByText('Camera access needed')).toBeTruthy();
+    expect(screen.getByLabelText('Open settings')).toBeTruthy();
+
+    await fireEvent.press(screen.getByLabelText('Not now'));
+    expect(screen.queryByText('Camera access needed')).toBeNull();
+    expect(picker.launchCameraAsync).not.toHaveBeenCalled();
+  });
 });

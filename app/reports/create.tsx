@@ -4,7 +4,8 @@ import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
-import { Alert, Linking } from 'react-native';
+import { ImageOff, Camera as CameraIcon } from 'lucide-react-native';
+import { Linking } from 'react-native';
 
 import { uploadMedia, type UploadFile } from '@/api/media.api';
 import { errorMessage } from '@/api/errors';
@@ -19,6 +20,7 @@ import {
   type SubmitStage,
 } from '@/components/reports/submit-footer';
 import { InlineAlert } from '@/components/ui/alert';
+import { Dialog } from '@/components/ui/dialog';
 import { TextField } from '@/components/ui/field';
 import { Screen, ScreenHeader } from '@/components/ui/layout';
 import { useCreateReport } from '@/hooks/use-reports';
@@ -115,6 +117,9 @@ export default function CreateReportScreen() {
   const [locationError, setLocationError] = useState<string | null>(null);
   const [submitStage, setSubmitStage] = useState<SubmitStage>('idle');
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [permissionPrompt, setPermissionPrompt] = useState<
+    'camera' | 'library' | null
+  >(null);
 
   const applyLocation = useCallback((result: LocationResult) => {
     if (result.ok) {
@@ -170,10 +175,7 @@ export default function CreateReportScreen() {
   const pickFromGallery = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert(
-        'Permission needed',
-        'Allow photo access to choose a report photo, or use the camera instead.',
-      );
+      setPermissionPrompt('library');
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -189,10 +191,7 @@ export default function CreateReportScreen() {
   const takePhoto = async () => {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert(
-        'Camera permission needed',
-        'Allow camera access to take a report photo.',
-      );
+      setPermissionPrompt('camera');
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
@@ -330,6 +329,34 @@ export default function CreateReportScreen() {
             maxLength={2000}
           />
         )}
+      />
+      <Dialog
+        visible={permissionPrompt !== null}
+        tone="warning"
+        icon={(color) =>
+          permissionPrompt === 'camera' ? (
+            <CameraIcon size={26} color={color} />
+          ) : (
+            <ImageOff size={26} color={color} />
+          )
+        }
+        title={
+          permissionPrompt === 'camera'
+            ? 'Camera access needed'
+            : 'Photo access needed'
+        }
+        message={
+          permissionPrompt === 'camera'
+            ? 'Allow camera access in Settings to take a report photo.'
+            : 'Allow photo access in Settings to choose a photo, or take one with the camera instead.'
+        }
+        confirmLabel="Open settings"
+        cancelLabel="Not now"
+        onConfirm={() => {
+          setPermissionPrompt(null);
+          openSettings();
+        }}
+        onCancel={() => setPermissionPrompt(null)}
       />
     </Screen>
   );
