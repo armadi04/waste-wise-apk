@@ -31,7 +31,7 @@ Brand artwork comes from `waste-wise-web/frontend`:
 - App icon, adaptive icon, monochrome icon, and splash are generated from
   `public/favicon_io/android-chrome-512x512.png`.
 - In-app logo is generated from the same source.
-- The auth hero uses a theme-aware SVG pattern in
+- The auth hero uses a theme-aware SVG gradient and the recycled logo mark in
   `src/components/auth/auth-hero.tsx`.
 - Empty and not-found animations are `src/assets/lottie/empty.json` and
   `src/assets/lottie/404.json`.
@@ -43,6 +43,7 @@ The mobile app uses the existing NestJS API under `/api/v1` plus two small backe
 - Google auto-registration for unknown Google accounts with the default `user` role.
 - Native mobile session endpoints:
   - `POST /api/v1/auth/mobile/google`
+  - `POST /api/v1/auth/mobile/2fa/verify`
   - `POST /api/v1/auth/mobile/refresh`
   - `POST /api/v1/auth/mobile/logout`
 
@@ -151,6 +152,7 @@ bun run spec:generate
 | Feature | Endpoint |
 |---|---|
 | Google mobile login | `POST /auth/mobile/google` |
+| Mobile 2FA verify | `POST /auth/mobile/2fa/verify` |
 | Refresh | `POST /auth/mobile/refresh` |
 | Logout | `POST /auth/mobile/logout` |
 | Session identity | `GET /auth/me` |
@@ -166,6 +168,7 @@ AI classification runs inside NestJS when the report is created. Mobile never ca
 ## Behaviour
 
 - Login is Google-only on one auth screen. New Google accounts are registered automatically by NestJS.
+- Accounts with 2FA enabled receive a short-lived challenge, then verify it on the mobile 2FA screen with an authenticator or recovery code. The challenge stays in memory and expires after 5 minutes.
 - Access tokens last 15 minutes; refresh rotates the token pair. An invalid or expired refresh token clears the session. Transient network failures keep the session and show a retry screen.
 - A report requires a photo, GPS coordinates, and a 3–2000 character description.
 - Photos are compressed client-side to JPEG below 5 MB before upload.
@@ -176,7 +179,7 @@ AI classification runs inside NestJS when the report is created. Mobile never ca
 
 ## Out of scope
 
-Admin actions, status updates, editing/deleting submitted reports, offline submission, push notifications, iOS builds, and mobile 2FA. Accounts with 2FA enabled are directed to complete verification in the web app.
+Admin actions, status updates, editing/deleting submitted reports, offline submission, push notifications, iOS builds, and 2FA enrollment or disablement in mobile. Existing 2FA accounts can complete verification in mobile; enrollment remains web-only.
 
 Regenerate brand assets after changing the web source:
 

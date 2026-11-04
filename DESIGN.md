@@ -201,8 +201,15 @@ supports them. Long list rows use truncation plus accessible full content where 
 - Auth uses one screen and one Google CTA. New accounts are created automatically, so do not
   add a separate register form or a login/register toggle. Show loading text on the CTA and
   announce errors through a live region.
+- Auth layout uses a branded hero above a compact bottom dock. Keep the dock content-sized
+  instead of stretching it to fill the screen; the hero absorbs remaining height. Use
+  `surface` for the dock so dark mode does not render a pure black plane. Anchor the CTA at the
+  bottom of the dock for thumb reach.
 - When a stored session cannot be restored because of a transient failure, keep the tokens and
   show a retry screen; clear tokens only for an invalid or expired session.
+- Two-factor verification is a second auth step. Keep the challenge token in memory only, show a
+  single code field that accepts TOTP or recovery codes, and offer a clear start-over action.
+  Never place the challenge token in a URL or persistent storage.
 - Confirm destructive actions, retain drafts on API failure and surface actionable errors.
 - Permission gates apply to navigation and actions; never imply a UI gate authorizes API
   access.
