@@ -228,6 +228,23 @@ supports them. Long list rows use truncation plus accessible full content where 
 - Use `Screen` for safe areas, padding, scrolling and refresh behavior.
 - Forms own values through React Hook Form and Zod; modal stores own open and selection state
   only.
+- Choices that need more room than a dialog (report filters, time zone, 2FA code entry)
+  use `BottomSheet` (`src/components/ui/bottom-sheet.tsx`): `scrim`, `surface` panel with
+  `radius.xl` top corners, a drag handle, a header title and an optional footer of actions.
+  Mount sheets only while open so their draft state resets.
+- Profile is a hub: identity card with "Edit profile", then `ListGroup`/`ListRow` groups
+  (Account: Security, Sessions; App: Notifications, What's new). Rows are at least 60 dp,
+  show a short trailing value (On/Off, counts, version) and a chevron.
+- Home shows a bell with an unread badge (`dangerSolid`, capped at 99+) next to the avatar.
+  Notification rows show a type icon, bold title and dot while unread; tapping marks them
+  read and opens linked reports.
+- Report History filters: status chips inline, category and date presets in the filter
+  sheet, active extras as removable chips. The filter button shows the active count.
+- Report actions (Edit, Delete) appear only for the owner while the report is Pending.
+  Delete always goes through a danger `Dialog`.
+- 2FA setup shows recovery codes once, selectable for copying, and requires an explicit
+  "I've saved these codes" acknowledgement. Disabling 2FA or replacing codes always asks
+  for a code first.
 - Confirmations and permission prompts use the themed `Dialog` (`src/components/ui/dialog.tsx`),
   never `Alert.alert`, which ignores the theme and fonts. Dialogs sit on the `scrim` token,
   use `surface` + `radius.xl`, a tone-tinted icon, a full-width confirm button (`danger` for
