@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'bun:test';
 
-import { capitalize, greeting, roundCoordinate } from '@/lib/format';
-import { parseReportFilter } from '@/lib/reports';
+import {
+  capitalize,
+  formatRelativeTime,
+  greeting,
+  roundCoordinate,
+} from '@/lib/format';
+import { groupByDay, parseReportFilter } from '@/lib/reports';
 
 describe('greeting', () => {
   it('maps hours to the right part of day', () => {
@@ -32,5 +37,54 @@ describe('roundCoordinate', () => {
   it('limits coordinates to 6 decimal places', () => {
     expect(roundCoordinate(-6.2000001234567)).toBe(-6.2);
     expect(roundCoordinate(106.8456789123)).toBe(106.845679);
+  });
+});
+
+describe('formatRelativeTime', () => {
+  const now = new Date(2026, 10, 5, 15, 0, 0);
+  const at = (...parts: [number, number, number, number, number, number?]) =>
+    new Date(...parts);
+
+  it('uses short relative labels for recent times', () => {
+    expect(formatRelativeTime(at(2026, 10, 5, 14, 59, 30), now)).toBe(
+      'Just now',
+    );
+    expect(formatRelativeTime(at(2026, 10, 5, 14, 1), now)).toBe('59m ago');
+    expect(formatRelativeTime(at(2026, 10, 5, 9, 0), now)).toBe('6h ago');
+    expect(formatRelativeTime(at(2026, 10, 4, 23, 33), now)).toBe('Yesterday');
+  });
+
+  it('falls back to dates for older items', () => {
+    expect(formatRelativeTime(at(2026, 9, 1, 8, 0), now)).toBe('01 Oct');
+    expect(formatRelativeTime(at(2025, 11, 31, 8, 0), now)).toBe('31 Dec 2025');
+    expect(formatRelativeTime(null, now)).toBe('—');
+    expect(formatRelativeTime('nope', now)).toBe('—');
+  });
+});
+
+describe('groupByDay', () => {
+  const now = new Date(2026, 10, 5, 15, 0, 0);
+
+  it('groups by local day in server order', () => {
+    const items = [
+      { id: 3, createdAt: new Date(2026, 10, 5, 10).toISOString() },
+      { id: 2, createdAt: new Date(2026, 10, 4, 23, 33).toISOString() },
+      { id: 1, createdAt: new Date(2026, 9, 30, 8).toISOString() },
+    ];
+    const sections = groupByDay(items, now);
+    expect(sections.map((s) => s.title)).toEqual([
+      'Today',
+      'Yesterday',
+      '30 Oct 2026',
+    ]);
+    expect(sections.map((s) => s.data.map((i) => i.id))).toEqual([
+      [3],
+      [2],
+      [1],
+    ]);
+  });
+
+  it('returns no sections for no items', () => {
+    expect(groupByDay([], now)).toEqual([]);
   });
 });

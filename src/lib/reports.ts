@@ -1,3 +1,6 @@
+import { format } from 'date-fns';
+
+import { formatDayTitle } from '@/lib/format';
 import type { ThemeColors } from '@/theme/tokens';
 import type { ReportFilter, ReportStatus, WasteCategory } from '@/types/domain';
 
@@ -116,4 +119,39 @@ export function toneColors(colors: ThemeColors, tone: Tone): ToneColors {
         solid: colors.mutedForeground,
       };
   }
+}
+
+export interface DaySection<T> {
+  key: string;
+  title: string;
+  data: T[];
+}
+
+/**
+ * Groups items into local calendar days, keeping the incoming (server) order.
+ * Items with an unparseable date fall into an "Unknown date" section.
+ */
+export function groupByDay<T extends { createdAt: string }>(
+  items: readonly T[],
+  now: Date = new Date(),
+): DaySection<T>[] {
+  const sections: DaySection<T>[] = [];
+  const byKey = new Map<string, DaySection<T>>();
+  for (const item of items) {
+    const date = new Date(item.createdAt);
+    const valid = !Number.isNaN(date.getTime());
+    const key = valid ? format(date, 'yyyy-MM-dd') : 'unknown';
+    let section = byKey.get(key);
+    if (!section) {
+      section = {
+        key,
+        title: valid ? formatDayTitle(date, now) : 'Unknown date',
+        data: [],
+      };
+      byKey.set(key, section);
+      sections.push(section);
+    }
+    section.data.push(item);
+  }
+  return sections;
 }
