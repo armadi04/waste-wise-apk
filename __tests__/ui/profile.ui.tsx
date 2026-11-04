@@ -21,6 +21,13 @@ jest.mock('@/auth/auth-provider', () => {
   };
   return { useAuth: () => state, __state: state };
 });
+jest.mock('expo-router', () => {
+  const router = { push: jest.fn() };
+  return { useRouter: () => router, __router: router };
+});
+jest.mock('@/hooks/use-notifications', () => ({
+  useUnreadNotificationCount: () => ({ data: 2 }),
+}));
 jest.mock('expo-constants', () => ({
   __esModule: true,
   default: { expoConfig: { version: '1.2.3' } },
@@ -94,5 +101,23 @@ describe('profile screen', () => {
     const confirm = screen.getAllByLabelText('Log out');
     await fireEvent.press(confirm[confirm.length - 1]!);
     await waitFor(() => expect(auth.signOut).toHaveBeenCalledTimes(1));
+  });
+
+  it('links to account and app pages', async () => {
+    const router = (
+      jest.requireMock('expo-router') as { __router: { push: jest.Mock } }
+    ).__router;
+    await render(<ProfileScreen />);
+
+    for (const [label, route] of [
+      ['Edit profile', '/profile/edit'],
+      ['Security, Two-factor authentication', '/profile/security'],
+      ['Sessions, Devices signed in to your account', '/profile/sessions'],
+      ['Notifications, 2 new', '/notifications'],
+      ["What's new, v1.2.3", '/changelog'],
+    ] as const) {
+      await fireEvent.press(screen.getByLabelText(label));
+      expect(router.push).toHaveBeenLastCalledWith(route);
+    }
   });
 });

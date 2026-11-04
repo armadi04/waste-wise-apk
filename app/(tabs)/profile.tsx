@@ -1,5 +1,13 @@
 import Constants from 'expo-constants';
-import { LogOut, ShieldCheck } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import {
+  Bell,
+  LogOut,
+  MonitorSmartphone,
+  Pencil,
+  ShieldCheck,
+  Sparkles,
+} from 'lucide-react-native';
 import { useState } from 'react';
 import { RefreshControl, View } from 'react-native';
 
@@ -9,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Dialog } from '@/components/ui/dialog';
+import { ListGroup, ListRow } from '@/components/ui/list-row';
 import {
   Divider,
   Screen,
@@ -17,6 +26,7 @@ import {
 } from '@/components/ui/layout';
 import { Segmented } from '@/components/ui/segmented';
 import { AppText } from '@/components/ui/text';
+import { useUnreadNotificationCount } from '@/hooks/use-notifications';
 import { capitalize } from '@/lib/format';
 import { useTheme } from '@/theme';
 
@@ -35,6 +45,8 @@ export default function ProfileScreen() {
   const [signingOut, setSigningOut] = useState(false);
   const [confirmingLogout, setConfirmingLogout] = useState(false);
 
+  const router = useRouter();
+  const unread = useUnreadNotificationCount().data ?? 0;
   const version = Constants.expoConfig?.version;
   const role = user?.roles?.[0]?.name ?? 'user';
 
@@ -94,7 +106,29 @@ export default function ProfileScreen() {
             Signed in with Google
           </AppText>
         </View>
+        <Button
+          label="Edit profile"
+          variant="outline"
+          fullWidth
+          icon={<Pencil size={16} color={colors.foreground} />}
+          onPress={() => router.push('/profile/edit')}
+        />
       </Card>
+
+      <ListGroup title="Account">
+        <ListRow
+          icon={ShieldCheck}
+          title="Security"
+          subtitle="Two-factor authentication"
+          onPress={() => router.push('/profile/security')}
+        />
+        <ListRow
+          icon={MonitorSmartphone}
+          title="Sessions"
+          subtitle="Devices signed in to your account"
+          onPress={() => router.push('/profile/sessions')}
+        />
+      </ListGroup>
 
       <Card style={{ gap: spacing.md }}>
         <SectionHeader title="Theme" />
@@ -104,6 +138,21 @@ export default function ProfileScreen() {
           onChange={(value) => void setPreference(value)}
         />
       </Card>
+
+      <ListGroup title="App">
+        <ListRow
+          icon={Bell}
+          title="Notifications"
+          value={unread ? `${unread} new` : undefined}
+          onPress={() => router.push('/notifications')}
+        />
+        <ListRow
+          icon={Sparkles}
+          title="What's new"
+          value={version ? `v${version}` : undefined}
+          onPress={() => router.push('/changelog')}
+        />
+      </ListGroup>
 
       <View style={{ gap: spacing.sm, marginTop: spacing.lg }}>
         <Button
