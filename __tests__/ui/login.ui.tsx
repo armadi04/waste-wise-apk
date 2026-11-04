@@ -1,0 +1,113 @@
+/// <reference types="jest" />
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react-native';
+
+import LoginScreen from '../../app/(auth)/login';
+
+jest.mock('@/auth/auth-provider', () => {
+  const state = {
+    isSigningIn: false,
+    signInWithGoogle: jest.fn(),
+  };
+  return {
+    useAuth: () => state,
+    __authState: state,
+  };
+});
+
+jest.mock('@/theme', () => {
+  const tokens = jest.requireActual('@/theme/tokens');
+  return {
+    useTheme: () => ({
+      mode: 'light',
+      preference: 'system',
+      colors: tokens.lightColors,
+      spacing: tokens.spacing,
+      radius: tokens.radius,
+      typography: tokens.typography,
+      fontFamily: tokens.fontFamily,
+      setPreference: jest.fn(),
+      hydrated: true,
+    }),
+  };
+});
+
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 }),
+}));
+
+jest.mock('@/lib/config', () => ({ IS_GOOGLE_CONFIGURED: true }));
+jest.mock('@/components/ui/google-icon', () => ({ GoogleIcon: () => null }));
+jest.mock('lucide-react-native', () => ({ ShieldCheck: () => null }));
+jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
+
+const authState = (
+  jest.requireMock('@/auth/auth-provider') as {
+    __authState: {
+      isSigningIn: boolean;
+      signInWithGoogle: jest.Mock;
+    };
+  }
+).__authState;
+
+describe('login screen', () => {
+  beforeEach(() => {
+    authState.isSigningIn = false;
+    authState.signInWithGoogle.mockReset();
+  });
+
+  it('renders one Google CTA without a register toggle', async () => {
+    await render(<LoginScreen />);
+
+    expect(screen.getByText('Continue with Google')).toBeTruthy();
+    expect(screen.queryByText('Sign up')).toBeNull();
+    expect(screen.queryByText('Log In')).toBeNull();
+  });
+
+  it('starts Google sign-in from the CTA', async () => {
+    authState.signInWithGoogle.mockResolvedValue({ status: 'cancelled' });
+    await render(<LoginScreen />);
+
+    fireEvent.press(screen.getByTestId('google-sign-in-button'));
+
+    await waitFor(() =>
+      expect(authState.signInWithGoogle).toHaveBeenCalledTimes(1),
+    );
+  });
+
+  it('shows sign-in errors in an accessible alert', async () => {
+    authState.signInWithGoogle.mockResolvedValue({
+      status: 'error',
+      error: {
+        code: 'network',
+        message: 'Check your connection and try again.',
+      },
+    });
+    await render(<LoginScreen />);
+
+    fireEvent.press(screen.getByTestId('google-sign-in-button'));
+
+    expect(
+      await screen.findByText('Check your connection and try again.'),
+    ).toBeTruthy();
+    const alert = screen.getByTestId('auth-error');
+    expect(alert.props.accessibilityRole).toBe('alert');
+    expect(alert.props.accessibilityLiveRegion).toBe('polite');
+  });
+
+  it('announces the loading state', async () => {
+    const view = await render(<LoginScreen />);
+
+    authState.isSigningIn = true;
+    await view.rerender(<LoginScreen />);
+
+    expect(screen.getByText('Signing in…')).toBeTruthy();
+    expect(
+      screen.getByTestId('google-sign-in-button').props.accessibilityState,
+    ).toMatchObject({ busy: true });
+  });
+});

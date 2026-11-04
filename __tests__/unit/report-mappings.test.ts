@@ -38,7 +38,10 @@ describe('report display mappings', () => {
   });
 
   it('builds media URLs from the API origin instead of backend APP_URL', () => {
-    const media = { id: 42, url: 'http://localhost:3001/api/v1/media/42/view' } as Media;
+    const media = {
+      id: 42,
+      url: 'http://localhost:3001/api/v1/media/42/view',
+    } as Media;
     expect(mediaViewUrl(media)).toMatch(/\/api\/v1\/media\/42\/view$/);
     expect(mediaViewUrl(null)).toBeNull();
   });
