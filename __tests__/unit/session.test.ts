@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 
 import { ApiError } from '@/api/errors';
-import { isInvalidSessionError } from '@/api/session';
+import { isAuthRoute, isInvalidSessionError } from '@/api/session';
 
 describe('session error detection', () => {
   it('treats 401 and 403 as invalid sessions', () => {
@@ -13,5 +13,19 @@ describe('session error detection', () => {
     expect(isInvalidSessionError(new ApiError('Offline'))).toBe(false);
     expect(isInvalidSessionError(new ApiError('Down', 500))).toBe(false);
     expect(isInvalidSessionError(new Error('Timeout'))).toBe(false);
+  });
+});
+
+describe('auth route detection', () => {
+  it('skips refresh for pre-login and token endpoints', () => {
+    expect(isAuthRoute('/auth/mobile/2fa/verify')).toBe(true);
+    expect(isAuthRoute('/auth/mobile/google')).toBe(true);
+    expect(isAuthRoute('/auth/mobile/refresh')).toBe(true);
+    expect(isAuthRoute('/auth/mobile/logout')).toBe(true);
+  });
+
+  it('keeps authenticated routes refreshable', () => {
+    expect(isAuthRoute('/reports')).toBe(false);
+    expect(isAuthRoute('/auth/profile')).toBe(false);
   });
 });

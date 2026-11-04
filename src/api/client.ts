@@ -13,7 +13,7 @@ import {
 import { API_BASE_URL } from '@/lib/config';
 
 import { ApiError, toApiError } from './errors';
-import { isInvalidSessionError } from './session';
+import { isAuthRoute, isInvalidSessionError } from './session';
 
 type UnauthorizedHandler = () => void | Promise<void>;
 
@@ -84,12 +84,7 @@ api.interceptors.response.use(
     const original = error.config as
       (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
     const url = original?.url ?? '';
-    const isAuthRoute =
-      url.includes('/auth/mobile/refresh') ||
-      url.includes('/auth/mobile/google') ||
-      url.includes('/auth/mobile/logout');
-
-    if (status === 401 && original && !original._retry && !isAuthRoute) {
+    if (status === 401 && original && !original._retry && !isAuthRoute(url)) {
       original._retry = true;
       try {
         const accessToken = await refreshAccessToken();
