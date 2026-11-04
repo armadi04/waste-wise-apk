@@ -1,13 +1,14 @@
 import Constants from 'expo-constants';
 import { LogOut, ShieldCheck } from 'lucide-react-native';
 import { useState } from 'react';
-import { Alert, RefreshControl, View } from 'react-native';
+import { RefreshControl, View } from 'react-native';
 
 import { useAuth } from '@/auth/auth-provider';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Dialog } from '@/components/ui/dialog';
 import {
   Divider,
   Screen,
@@ -32,6 +33,7 @@ export default function ProfileScreen() {
   const { user, signOut, reloadProfile } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const [confirmingLogout, setConfirmingLogout] = useState(false);
 
   const version = Constants.expoConfig?.version;
   const role = user?.roles?.[0]?.name ?? 'user';
@@ -43,17 +45,11 @@ export default function ProfileScreen() {
   };
 
   const handleLogout = () => {
-    Alert.alert('Log out?', 'You will need to sign in with Google again.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Log out',
-        style: 'destructive',
-        onPress: () => {
-          setSigningOut(true);
-          void signOut().finally(() => setSigningOut(false));
-        },
-      },
-    ]);
+    setSigningOut(true);
+    void signOut().finally(() => {
+      setSigningOut(false);
+      setConfirmingLogout(false);
+    });
   };
 
   return (
@@ -116,7 +112,7 @@ export default function ProfileScreen() {
           fullWidth
           icon={<LogOut size={17} color={colors.danger} />}
           loading={signingOut}
-          onPress={handleLogout}
+          onPress={() => setConfirmingLogout(true)}
         />
         <AppText
           variant="caption"
@@ -135,6 +131,18 @@ export default function ProfileScreen() {
           </AppText>
         ) : null}
       </View>
+      <Dialog
+        visible={confirmingLogout}
+        tone="danger"
+        icon={(color) => <LogOut size={26} color={color} />}
+        title="Log out?"
+        message="You will need to sign in with Google again on this device."
+        confirmLabel="Log out"
+        loading={signingOut}
+        loadingLabel="Logging out…"
+        onConfirm={handleLogout}
+        onCancel={() => setConfirmingLogout(false)}
+      />
     </Screen>
   );
 }

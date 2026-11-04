@@ -1,12 +1,15 @@
 /// <reference types="jest" />
-import { fireEvent, render, screen } from '@testing-library/react-native';
-
-import { Alert } from 'react-native';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react-native';
 
 import ProfileScreen from '../../app/(tabs)/profile';
 
-jest.mock('@/auth/auth-provider', () => ({
-  useAuth: () => ({
+jest.mock('@/auth/auth-provider', () => {
+  const state = {
     user: {
       fullname: 'Explore',
       email: 'explore@example.com',
@@ -15,8 +18,9 @@ jest.mock('@/auth/auth-provider', () => ({
     },
     signOut: jest.fn().mockResolvedValue(undefined),
     reloadProfile: jest.fn().mockResolvedValue(undefined),
-  }),
-}));
+  };
+  return { useAuth: () => state, __state: state };
+});
 jest.mock('expo-constants', () => ({
   __esModule: true,
   default: { expoConfig: { version: '1.2.3' } },
@@ -69,14 +73,26 @@ describe('profile screen', () => {
     expect(screen.getByText('WasteWise v1.2.3')).toBeTruthy();
   });
 
-  it('confirms before logging out', async () => {
-    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+  it('confirms in a themed dialog before logging out', async () => {
+    const auth = (
+      jest.requireMock('@/auth/auth-provider') as {
+        __state: { signOut: jest.Mock };
+      }
+    ).__state;
+    auth.signOut.mockClear();
     await render(<ProfileScreen />);
-    fireEvent.press(screen.getByLabelText('Log out'));
-    expect(alert).toHaveBeenCalledWith(
-      'Log out?',
-      expect.any(String),
-      expect.any(Array),
-    );
+
+    expect(screen.queryByText('Log out?')).toBeNull();
+    await fireEvent.press(screen.getByLabelText('Log out'));
+    expect(screen.getByText('Log out?')).toBeTruthy();
+
+    await fireEvent.press(screen.getByLabelText('Cancel'));
+    expect(screen.queryByText('Log out?')).toBeNull();
+    expect(auth.signOut).not.toHaveBeenCalled();
+
+    await fireEvent.press(screen.getByLabelText('Log out'));
+    const confirm = screen.getAllByLabelText('Log out');
+    await fireEvent.press(confirm[confirm.length - 1]!);
+    await waitFor(() => expect(auth.signOut).toHaveBeenCalledTimes(1));
   });
 });
