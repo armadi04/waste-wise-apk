@@ -16,6 +16,7 @@ interface ButtonProps extends Omit<PressableProps, 'children' | 'style'> {
   label: string;
   variant?: Variant;
   loading?: boolean;
+  loadingLabel?: string;
   icon?: React.ReactNode;
   fullWidth?: boolean;
   style?: ViewStyle;
@@ -25,10 +26,12 @@ export function Button({
   label,
   variant = 'primary',
   loading = false,
+  loadingLabel,
   disabled,
   icon,
   fullWidth,
   style,
+  accessibilityLabel,
   ...rest
 }: ButtonProps) {
   const { colors, radius, spacing, fontFamily } = useTheme();
@@ -63,6 +66,9 @@ export function Button({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={
+        accessibilityLabel ?? (loading ? (loadingLabel ?? label) : label)
+      }
       accessibilityState={{ disabled: isDisabled, busy: loading }}
       disabled={isDisabled}
       {...rest}
@@ -77,15 +83,16 @@ export function Button({
           gap: spacing.sm,
           borderWidth: variant === 'outline' ? 1 : 0,
           borderColor,
-          backgroundColor: pressed && !isDisabled
-            ? variant === 'primary'
-              ? colors.primaryPressed
-              : variant === 'danger'
-                ? colors.dangerBorder
-                : variant === 'secondary'
-                  ? colors.selectedHover
-                  : colors.surfaceHover
-            : background,
+          backgroundColor:
+            pressed && !isDisabled
+              ? variant === 'primary'
+                ? colors.primaryPressed
+                : variant === 'danger'
+                  ? colors.dangerBorder
+                  : variant === 'secondary'
+                    ? colors.selectedHover
+                    : colors.surfaceHover
+              : background,
           opacity: fullWidth ? 1 : undefined,
           alignSelf: fullWidth ? 'stretch' : 'flex-start',
         },
@@ -93,9 +100,32 @@ export function Button({
       ]}
     >
       {loading ? (
-        <ActivityIndicator size="small" color={foreground} />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: spacing.sm,
+          }}
+        >
+          <ActivityIndicator size="small" color={foreground} />
+          {loadingLabel ? (
+            <AppText
+              variant="button"
+              color={foreground}
+              style={{ fontFamily: fontFamily.semibold }}
+            >
+              {loadingLabel}
+            </AppText>
+          ) : null}
+        </View>
       ) : (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: spacing.sm,
+          }}
+        >
           {icon}
           <AppText
             variant="button"
