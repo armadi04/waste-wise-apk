@@ -12,6 +12,10 @@ jest.mock('@/auth/auth-provider', () => ({
   useAuth: () => ({ user: { fullname: 'Explore Crawl', avatar: null } }),
 }));
 
+jest.mock('@/hooks/use-notifications', () => ({
+  useUnreadNotificationCount: () => ({ data: 3 }),
+}));
+
 jest.mock('@/hooks/use-reports', () => ({
   useReportStats: () => ({
     isLoading: false,
@@ -106,5 +110,11 @@ describe('dashboard screen', () => {
       pathname: '/reports',
       params: { category: 'PLASTIC_WASTE' },
     });
+  });
+
+  it('shows unread notifications on the bell', async () => {
+    await render(<DashboardScreen />);
+    await fireEvent.press(screen.getByLabelText('Notifications, 3 unread'));
+    expect(router.push).toHaveBeenCalledWith('/notifications');
   });
 });

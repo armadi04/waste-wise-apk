@@ -63,6 +63,7 @@ function RootNavigator() {
           <Stack.Screen name="reports/create" />
           <Stack.Screen name="reports/[id]/index" />
           <Stack.Screen name="reports/[id]/edit" />
+          <Stack.Screen name="notifications" />
         </Stack.Protected>
         <Stack.Protected guard={status !== 'authenticated'}>
           <Stack.Screen name="(auth)" />

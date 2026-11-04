@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { Bell } from 'lucide-react-native';
 import { Pressable, RefreshControl, View } from 'react-native';
 
 import { errorMessage } from '@/api/errors';
@@ -12,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Screen, SectionHeader } from '@/components/ui/layout';
 import { EmptyState, ErrorState, Skeleton } from '@/components/ui/states';
 import { AppText } from '@/components/ui/text';
+import { useUnreadNotificationCount } from '@/hooks/use-notifications';
 import { useReportStats } from '@/hooks/use-reports';
 import { greeting } from '@/lib/format';
 import { useTheme } from '@/theme';
@@ -21,6 +23,8 @@ export default function DashboardScreen() {
   const { user } = useAuth();
   const router = useRouter();
   const stats = useReportStats();
+  const unread = useUnreadNotificationCount().data ?? 0;
+  const unreadLabel = unread > 99 ? '99+' : String(unread);
 
   const openReport = (id: number) =>
     router.push({ pathname: '/reports/[id]', params: { id: String(id) } });
@@ -54,6 +58,52 @@ export default function DashboardScreen() {
             {firstName}
           </AppText>
         </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={
+            unread ? `Notifications, ${unreadLabel} unread` : 'Notifications'
+          }
+          onPress={() => router.push('/notifications')}
+          style={({ pressed }) => ({
+            width: 44,
+            height: 44,
+            borderRadius: 22,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderWidth: 1,
+            borderColor: colors.borderSubtle,
+            backgroundColor: pressed ? colors.surfaceHover : colors.surface,
+          })}
+        >
+          <Bell size={20} color={colors.foreground} />
+          {unread ? (
+            <View
+              style={{
+                position: 'absolute',
+                top: -4,
+                right: -4,
+                minWidth: 20,
+                height: 20,
+                paddingHorizontal: 5,
+                borderRadius: 10,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: colors.dangerSolid,
+                borderWidth: 2,
+                borderColor: colors.background,
+              }}
+            >
+              <AppText
+                variant="caption"
+                weight="semibold"
+                color={colors.dangerSolidForeground}
+                style={{ fontSize: 10, lineHeight: 12 }}
+              >
+                {unreadLabel}
+              </AppText>
+            </View>
+          ) : null}
+        </Pressable>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Open profile"
