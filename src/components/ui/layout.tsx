@@ -12,6 +12,7 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 
+import { useTabBarInset } from '@/components/navigation/tab-bar-inset';
 import { useTheme } from '@/theme';
 
 import { AppText } from './text';
@@ -36,13 +37,14 @@ export function Screen({
 }: ScreenProps) {
   const { colors, spacing } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabBarInset = useTabBarInset();
   const content = scroll ? (
     <ScrollView
       contentContainerStyle={[
         {
           padding: spacing.lg,
           gap: spacing.lg,
-          paddingBottom: footer ? spacing.xxl : spacing.huge,
+          paddingBottom: footer ? spacing.xxl : tabBarInset || spacing.huge,
         },
         contentContainerStyle,
       ]}
