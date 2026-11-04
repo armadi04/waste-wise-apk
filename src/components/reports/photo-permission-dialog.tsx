@@ -26,7 +26,7 @@ export function PhotoPermissionDialog({
       title={camera ? 'Camera access needed' : 'Photo access needed'}
       message={
         camera
-          ? 'Allow camera access in Settings to take a report photo.'
+          ? 'Allow camera access in Settings to take a photo.'
           : 'Allow photo access in Settings to choose a photo, or take one with the camera instead.'
       }
       confirmLabel="Open settings"

@@ -14,6 +14,10 @@ export const queryKeys = {
     unread: ['notifications', 'unread'] as const,
   },
   changelog: ['changelog'] as const,
+  timeZone: {
+    config: ['time-zone', 'config'] as const,
+    preference: ['time-zone', 'preference'] as const,
+  },
   reports: {
     all: ['reports'] as const,
     list: (

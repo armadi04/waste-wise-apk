@@ -73,3 +73,7 @@ export interface ReleaseNotes {
   publishedAt: string | null;
   url: string;
 }
+
+export type TimeZoneConfig = components['schemas']['TimeZoneConfigResponseDto'];
+export type TimeZonePreference =
+  components['schemas']['TimeZonePreferenceResponseDto'];

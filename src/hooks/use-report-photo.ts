@@ -10,7 +10,18 @@ export type PhotoPermission = 'camera' | 'library' | null;
  * Photo selection for report forms: pick or capture, compress, and remember
  * the uploaded `mediaId` so a retry never uploads twice.
  */
-export function useReportPhoto() {
+export function useReportPhoto({
+  crop,
+}: {
+  /** Let the user crop to this aspect ratio in the system editor. */
+  crop?: [number, number];
+} = {}) {
+  const pickerOptions: ImagePicker.ImagePickerOptions = {
+    mediaTypes: ['images'],
+    allowsEditing: Boolean(crop),
+    ...(crop ? { aspect: crop } : {}),
+    quality: 0.9,
+  };
   const [asset, setAsset] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [prepared, setPrepared] = useState<UploadFile | null>(null);
   const [preparing, setPreparing] = useState(false);
@@ -46,11 +57,7 @@ export function useReportPhoto() {
       setPermissionPrompt('library');
       return;
     }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: false,
-      quality: 0.9,
-    });
+    const result = await ImagePicker.launchImageLibraryAsync(pickerOptions);
     if (!result.canceled && result.assets[0]) {
       await handleAsset(result.assets[0]);
     }
@@ -62,11 +69,7 @@ export function useReportPhoto() {
       setPermissionPrompt('camera');
       return;
     }
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ['images'],
-      allowsEditing: false,
-      quality: 0.9,
-    });
+    const result = await ImagePicker.launchCameraAsync(pickerOptions);
     if (!result.canceled && result.assets[0]) {
       await handleAsset(result.assets[0]);
     }
