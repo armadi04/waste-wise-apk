@@ -228,7 +228,11 @@ supports them. Long list rows use truncation plus accessible full content where 
 - Use `Screen` for safe areas, padding, scrolling and refresh behavior.
 - Forms own values through React Hook Form and Zod; modal stores own open and selection state
   only.
-- Use native modals and sheets with labeled controls and accessible dismissal.
+- Confirmations and permission prompts use the themed `Dialog` (`src/components/ui/dialog.tsx`),
+  never `Alert.alert`, which ignores the theme and fonts. Dialogs sit on the `scrim` token,
+  use `surface` + `radius.xl`, a tone-tinted icon, a full-width confirm button (`danger` for
+  destructive actions) and a ghost Cancel. Back button, scrim tap and Cancel all dismiss,
+  except while the confirm action is loading.
 - Auth uses one screen and one Google CTA. New accounts are created automatically, so do not
   add a separate register form or a login/register toggle. Show loading text on the CTA and
   announce errors through a live region.
