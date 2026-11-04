@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { CheckCheck, Plus } from 'lucide-react-native';
+import { CheckCheck } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 
 import { errorMessage } from '@/api/errors';
+import { useTabBarInset } from '@/components/navigation/tab-bar-inset';
 import { ReportListItem } from '@/components/reports/report-list-item';
-import { Fab } from '@/components/ui/fab';
 import { Screen, ScreenHeader } from '@/components/ui/layout';
 import { SearchField } from '@/components/ui/search-field';
 import { Segmented } from '@/components/ui/segmented';
@@ -33,8 +33,6 @@ const FILTERS = [
   'COMPLETED',
   'REJECTED',
 ] as const;
-
-const FAB_CLEARANCE = 56 + 48;
 
 function filterCount(
   stats: ReportStats | undefined,
@@ -67,6 +65,7 @@ export default function ReportsScreen() {
   const search = useDebouncedValue(query.trim(), 300);
   const reports = useReports(filter, search);
   const stats = useReportStats();
+  const tabBarInset = useTabBarInset();
 
   if (params.status !== seenStatus) {
     setSeenStatus(params.status);
@@ -91,15 +90,6 @@ export default function ReportsScreen() {
       : total === 0
         ? 'No reports yet.'
         : `${total} ${total === 1 ? 'report' : 'reports'} submitted.`;
-
-  const openCreate = () => router.push('/reports/create');
-  const fab = (
-    <Fab
-      label="New report"
-      icon={<Plus size={20} color={colors.primaryForeground} />}
-      onPress={openCreate}
-    />
-  );
 
   const emptyState = search ? (
     <EmptyState
@@ -165,92 +155,86 @@ export default function ReportsScreen() {
           />
         </View>
       ) : items.length === 0 ? (
-        <>
+        <View style={{ flex: 1, paddingBottom: tabBarInset }}>
           {emptyState}
-          {fab}
-        </>
+        </View>
       ) : (
-        <>
-          <SectionList
-            sections={sections}
-            keyExtractor={(item) => String(item.id)}
-            stickySectionHeadersEnabled={false}
-            keyboardShouldPersistTaps="handled"
-            keyboardDismissMode="on-drag"
-            style={{ flex: 1 }}
-            contentContainerStyle={{
-              paddingHorizontal: spacing.lg,
-              paddingBottom: FAB_CLEARANCE + spacing.lg,
-            }}
-            renderSectionHeader={({ section }) => (
-              <AppText
-                variant="caption"
-                weight="semibold"
-                color={colors.mutedForeground}
-                accessibilityRole="header"
+        <SectionList
+          sections={sections}
+          keyExtractor={(item) => String(item.id)}
+          stickySectionHeadersEnabled={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            paddingHorizontal: spacing.lg,
+            paddingBottom: tabBarInset || spacing.huge,
+          }}
+          renderSectionHeader={({ section }) => (
+            <AppText
+              variant="caption"
+              weight="semibold"
+              color={colors.mutedForeground}
+              accessibilityRole="header"
+              style={{
+                textTransform: 'uppercase',
+                letterSpacing: 0.8,
+                marginTop: spacing.lg,
+                marginBottom: spacing.sm,
+              }}
+            >
+              {section.title}
+            </AppText>
+          )}
+          ItemSeparatorComponent={() => <View style={{ height: spacing.sm }} />}
+          renderItem={({ item }) => (
+            <ReportListItem
+              report={item}
+              onPress={() =>
+                router.push({
+                  pathname: '/reports/[id]',
+                  params: { id: String(item.id) },
+                })
+              }
+            />
+          )}
+          refreshControl={
+            <RefreshControl
+              refreshing={reports.isRefetching && !reports.isFetchingNextPage}
+              onRefresh={() => void reports.refetch()}
+              tintColor={colors.primary}
+              colors={[colors.primary]}
+            />
+          }
+          onEndReached={() => {
+            if (reports.hasNextPage && !reports.isFetchingNextPage) {
+              void reports.fetchNextPage();
+            }
+          }}
+          onEndReachedThreshold={0.4}
+          ListFooterComponent={
+            reports.isFetchingNextPage ? (
+              <View style={{ padding: spacing.lg, alignItems: 'center' }}>
+                <ActivityIndicator color={colors.primary} />
+              </View>
+            ) : !reports.hasNextPage ? (
+              <View
                 style={{
-                  textTransform: 'uppercase',
-                  letterSpacing: 0.8,
-                  marginTop: spacing.lg,
-                  marginBottom: spacing.sm,
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: spacing.xs,
+                  paddingVertical: spacing.xl,
                 }}
               >
-                {section.title}
-              </AppText>
-            )}
-            ItemSeparatorComponent={() => (
-              <View style={{ height: spacing.sm }} />
-            )}
-            renderItem={({ item }) => (
-              <ReportListItem
-                report={item}
-                onPress={() =>
-                  router.push({
-                    pathname: '/reports/[id]',
-                    params: { id: String(item.id) },
-                  })
-                }
-              />
-            )}
-            refreshControl={
-              <RefreshControl
-                refreshing={reports.isRefetching && !reports.isFetchingNextPage}
-                onRefresh={() => void reports.refetch()}
-                tintColor={colors.primary}
-                colors={[colors.primary]}
-              />
-            }
-            onEndReached={() => {
-              if (reports.hasNextPage && !reports.isFetchingNextPage) {
-                void reports.fetchNextPage();
-              }
-            }}
-            onEndReachedThreshold={0.4}
-            ListFooterComponent={
-              reports.isFetchingNextPage ? (
-                <View style={{ padding: spacing.lg, alignItems: 'center' }}>
-                  <ActivityIndicator color={colors.primary} />
-                </View>
-              ) : !reports.hasNextPage ? (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    gap: spacing.xs,
-                    paddingVertical: spacing.xl,
-                  }}
-                >
-                  <CheckCheck size={16} color={colors.mutedForeground} />
-                  <AppText variant="caption" color={colors.mutedForeground}>
-                    You&apos;re all caught up
-                  </AppText>
-                </View>
-              ) : undefined
-            }
-          />
-          {fab}
-        </>
+                <CheckCheck size={16} color={colors.mutedForeground} />
+                <AppText variant="caption" color={colors.mutedForeground}>
+                  You&apos;re all caught up
+                </AppText>
+              </View>
+            ) : undefined
+          }
+        />
       )}
     </Screen>
   );

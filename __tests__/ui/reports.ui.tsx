@@ -133,10 +133,9 @@ describe('reports screen', () => {
     expect(screen.getByText('No reports yet')).toBeTruthy();
   });
 
-  it('opens the create screen from the FAB', async () => {
+  it('leaves new report creation to the tab bar', async () => {
     await render(<ReportsScreen />);
-    await fireEvent.press(screen.getByLabelText('New report'));
-    expect(router.push).toHaveBeenCalledWith('/reports/create');
+    expect(screen.queryByLabelText('New report')).toBeNull();
   });
 
   it('groups reports by day and shows the end of the list', async () => {
