@@ -16,10 +16,12 @@ const DOCK_ELEVATION = 12;
 export function AuthScreen({
   title,
   subtitle,
+  illustration,
   children,
 }: {
   title?: string;
   subtitle?: string;
+  illustration?: boolean;
   children: ReactNode;
 }) {
   const { colors, spacing } = useTheme();
@@ -37,7 +39,11 @@ export function AuthScreen({
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
       >
-        <AuthHero title={title} subtitle={subtitle} />
+        <AuthHero
+          title={title}
+          subtitle={subtitle}
+          illustration={illustration}
+        />
 
         <View
           style={[

@@ -6,6 +6,8 @@ import logo from '@/assets/brand/logo.png';
 import { authCopy } from '@/auth/auth-copy';
 import { BrandBackdrop } from '@/components/ui/brand-backdrop';
 import { AppText } from '@/components/ui/text';
+
+import { AuthIllustration } from './auth-illustration';
 import { useTheme } from '@/theme';
 
 const HERO_BOTTOM_SPACE = 48;
@@ -14,9 +16,12 @@ const HERO_COPY_WIDTH = 330;
 export function AuthHero({
   title = authCopy.title,
   subtitle = authCopy.subtitle,
+  illustration = false,
 }: {
   title?: string;
   subtitle?: string;
+  /** Show the decorative hero illustration (login only). */
+  illustration?: boolean;
 }) {
   const { colors, spacing } = useTheme();
   const insets = useSafeAreaInsets();
@@ -60,6 +65,8 @@ export function AuthHero({
           </AppText>
         </View>
       </View>
+
+      {illustration ? <AuthIllustration /> : null}
 
       <View style={[styles.copy, { gap: spacing.sm }]}>
         <AppText
