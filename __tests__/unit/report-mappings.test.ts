@@ -60,3 +60,21 @@ describe('parseWasteCategory', () => {
     expect(parseWasteCategory(undefined)).toBeNull();
   });
 });
+
+describe('dateRangeFor', () => {
+  it('maps presets to inclusive local days', async () => {
+    const { dateRangeFor } = await import('@/lib/reports');
+    const now = new Date(2026, 10, 5, 0, 30);
+    expect(dateRangeFor('any', now)).toEqual({});
+    expect(dateRangeFor('today', now)).toEqual({
+      from: '2026-11-05',
+      to: '2026-11-05',
+    });
+    expect(dateRangeFor('7d', now)).toEqual({
+      from: '2026-10-30',
+      to: '2026-11-05',
+    });
+    expect(dateRangeFor('30d', now).from).toBe('2026-10-07');
+    expect(dateRangeFor('year', now).from).toBe('2026-01-01');
+  });
+});

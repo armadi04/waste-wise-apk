@@ -3,7 +3,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 import ReportsScreen from '../../app/(tabs)/reports';
 
-const mockParams: { status?: string } = {};
+const mockParams: { status?: string; category?: string } = {};
 jest.mock('expo-router', () => {
   const router = { push: jest.fn(), replace: jest.fn() };
   return {
@@ -108,6 +108,7 @@ describe('reports screen', () => {
     router.push.mockReset();
     hooks.useReports.mockClear();
     delete mockParams.status;
+    delete mockParams.category;
     setItems([]);
   });
 
@@ -160,21 +161,59 @@ describe('reports screen', () => {
         screen.getByLabelText('Search reports'),
         'bottle',
       );
-      expect(hooks.useReports).not.toHaveBeenLastCalledWith('ALL', 'bottle');
+      expect(hooks.useReports).not.toHaveBeenLastCalledWith(
+        'ALL',
+        'bottle',
+        {},
+      );
 
       await act(async () => {
         jest.advanceTimersByTime(300);
       });
-      expect(hooks.useReports).toHaveBeenLastCalledWith('ALL', 'bottle');
+      expect(hooks.useReports).toHaveBeenLastCalledWith('ALL', 'bottle', {});
       expect(screen.getByText('No reports match "bottle"')).toBeTruthy();
 
       await fireEvent.press(screen.getAllByLabelText('Clear search')[0]!);
       await act(async () => {
         jest.advanceTimersByTime(300);
       });
-      expect(hooks.useReports).toHaveBeenLastCalledWith('ALL', '');
+      expect(hooks.useReports).toHaveBeenLastCalledWith('ALL', '', {});
     } finally {
       jest.useRealTimers();
     }
+  });
+
+  it('applies a category deep link as an active filter', async () => {
+    mockParams.category = 'PAPER_WASTE';
+    await render(<ReportsScreen />);
+
+    expect(hooks.useReports).toHaveBeenLastCalledWith('ALL', '', {
+      category: 'PAPER_WASTE',
+    });
+    expect(screen.getByLabelText('Filters, 1 active')).toBeTruthy();
+    expect(screen.getByText('No reports match these filters')).toBeTruthy();
+
+    await fireEvent.press(screen.getByLabelText('Remove filter Paper Waste'));
+    expect(hooks.useReports).toHaveBeenLastCalledWith('ALL', '', {});
+  });
+
+  it('filters by date range from the sheet', async () => {
+    await render(<ReportsScreen />);
+    await fireEvent.press(screen.getByLabelText('Filters'));
+    expect(screen.getByText('Filter reports')).toBeTruthy();
+
+    await fireEvent.press(screen.getByRole('radio', { name: 'Last 7 days' }));
+    await fireEvent.press(screen.getByRole('radio', { name: 'Organic Waste' }));
+    await fireEvent.press(screen.getByLabelText('Apply filters'));
+
+    const filters = hooks.useReports.mock.lastCall?.[2] as Record<
+      string,
+      string
+    >;
+    expect(filters.category).toBe('ORGANIC_WASTE');
+    expect(filters.from).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(filters.to).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(screen.queryByText('Filter reports')).toBeNull();
+    expect(screen.getByLabelText('Filters, 2 active')).toBeTruthy();
   });
 });

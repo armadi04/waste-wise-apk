@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, startOfYear, subDays } from 'date-fns';
 
 import { formatDayTitle } from '@/lib/format';
 import type { ThemeColors } from '@/theme/tokens';
@@ -178,4 +178,42 @@ export function parseWasteCategory(value: unknown): WasteCategory | null {
     (WASTE_CATEGORIES as readonly string[]).includes(value)
     ? (value as WasteCategory)
     : null;
+}
+
+export type DatePreset = 'any' | 'today' | '7d' | '30d' | 'year';
+
+export const DATE_PRESETS: readonly DatePreset[] = [
+  'any',
+  'today',
+  '7d',
+  '30d',
+  'year',
+];
+
+export const DATE_PRESET_LABEL: Record<DatePreset, string> = {
+  any: 'Any time',
+  today: 'Today',
+  '7d': 'Last 7 days',
+  '30d': 'Last 30 days',
+  year: 'This year',
+};
+
+/** Inclusive local-day range (YYYY-MM-DD) for a preset; empty for "any". */
+export function dateRangeFor(
+  preset: DatePreset,
+  now: Date = new Date(),
+): { from?: string; to?: string } {
+  const day = (date: Date) => format(date, 'yyyy-MM-dd');
+  switch (preset) {
+    case 'today':
+      return { from: day(now), to: day(now) };
+    case '7d':
+      return { from: day(subDays(now, 6)), to: day(now) };
+    case '30d':
+      return { from: day(subDays(now, 29)), to: day(now) };
+    case 'year':
+      return { from: day(startOfYear(now)), to: day(now) };
+    default:
+      return {};
+  }
 }

@@ -1,8 +1,9 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { CheckCheck } from 'lucide-react-native';
+import { CheckCheck, SlidersHorizontal, X } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Pressable,
   RefreshControl,
   SectionList,
   View,
@@ -11,6 +12,12 @@ import {
 import { errorMessage } from '@/api/errors';
 import { useTabBarInset } from '@/components/navigation/tab-bar-inset';
 import { ReportListItem } from '@/components/reports/report-list-item';
+import {
+  countExtraFilters,
+  EMPTY_EXTRA_FILTERS,
+  ReportFiltersSheet,
+  type ReportExtraFilters,
+} from '@/components/reports/report-filters-sheet';
 import { Screen, ScreenHeader } from '@/components/ui/layout';
 import { SearchField } from '@/components/ui/search-field';
 import { Segmented } from '@/components/ui/segmented';
@@ -19,9 +26,13 @@ import { AppText } from '@/components/ui/text';
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { useReports, useReportStats } from '@/hooks/use-reports';
 import {
+  DATE_PRESET_LABEL,
+  dateRangeFor,
   groupByDay,
   parseReportFilter,
+  parseWasteCategory,
   REPORT_FILTER_LABEL,
+  WASTE_CATEGORY_LABEL,
 } from '@/lib/reports';
 import { useTheme } from '@/theme';
 import type { ReportFilter, ReportStats } from '@/types/domain';
@@ -53,17 +64,70 @@ function filterCount(
   }
 }
 
+function ActiveFilterChip({
+  label,
+  onRemove,
+}: {
+  label: string;
+  onRemove: () => void;
+}) {
+  const { colors, radius, spacing } = useTheme();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Remove filter ${label}`}
+      onPress={onRemove}
+      hitSlop={{ top: 8, bottom: 8 }}
+      style={({ pressed }) => ({
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: spacing.xs,
+        minHeight: 32,
+        paddingLeft: spacing.md,
+        paddingRight: spacing.sm,
+        borderRadius: radius.pill,
+        backgroundColor: pressed
+          ? colors.selectedHover
+          : colors.selectedBackground,
+      })}
+    >
+      <AppText
+        variant="caption"
+        weight="semibold"
+        color={colors.selectedForeground}
+      >
+        {label}
+      </AppText>
+      <X size={14} color={colors.selectedForeground} />
+    </Pressable>
+  );
+}
+
 export default function ReportsScreen() {
-  const { colors, spacing } = useTheme();
+  const { colors, radius, spacing } = useTheme();
   const router = useRouter();
-  const params = useLocalSearchParams<{ status?: string }>();
+  const params = useLocalSearchParams<{ status?: string; category?: string }>();
   const [filter, setFilter] = useState<ReportFilter>(
     parseReportFilter(params.status) ?? 'ALL',
   );
   const [seenStatus, setSeenStatus] = useState(params.status);
+  const [extra, setExtra] = useState<ReportExtraFilters>(() => ({
+    ...EMPTY_EXTRA_FILTERS,
+    category: parseWasteCategory(params.category),
+  }));
+  const [seenCategory, setSeenCategory] = useState(params.category);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [query, setQuery] = useState('');
   const search = useDebouncedValue(query.trim(), 300);
-  const reports = useReports(filter, search);
+  const listFilters = useMemo(
+    () => ({
+      ...(extra.category ? { category: extra.category } : {}),
+      ...dateRangeFor(extra.date),
+    }),
+    [extra],
+  );
+  const reports = useReports(filter, search, listFilters);
+  const extraCount = countExtraFilters(extra);
   const stats = useReportStats();
   const tabBarInset = useTabBarInset();
 
@@ -71,6 +135,11 @@ export default function ReportsScreen() {
     setSeenStatus(params.status);
     const next = parseReportFilter(params.status);
     if (next) setFilter(next);
+  }
+  if (params.category !== seenCategory) {
+    setSeenCategory(params.category);
+    const next = parseWasteCategory(params.category);
+    if (next) setExtra((current) => ({ ...current, category: next }));
   }
 
   const items = useMemo(
@@ -91,46 +160,120 @@ export default function ReportsScreen() {
         ? 'No reports yet.'
         : `${total} ${total === 1 ? 'report' : 'reports'} submitted.`;
 
-  const emptyState = search ? (
-    <EmptyState
-      variant="plain"
-      fill
-      showAnimation={false}
-      title={`No reports match "${search}"`}
-      description="Try a different word or clear the search."
-      actionLabel="Clear search"
-      onAction={() => setQuery('')}
-    />
-  ) : (
-    <EmptyState
-      variant="plain"
-      fill
-      title={
-        filter === 'ALL'
-          ? 'No reports yet'
-          : `No ${REPORT_FILTER_LABEL[filter].toLowerCase()} reports`
-      }
-      description={
-        filter === 'ALL'
-          ? 'Snap a photo of waste and AI will classify it.'
-          : 'Reports appear here when their status changes.'
-      }
-      actionLabel={filter === 'ALL' ? undefined : 'Show all'}
-      onAction={filter === 'ALL' ? undefined : () => setFilter('ALL')}
-    />
-  );
+  const emptyState =
+    extraCount > 0 && !search ? (
+      <EmptyState
+        variant="plain"
+        fill
+        showAnimation={false}
+        title="No reports match these filters"
+        description="Try a wider date range or another category."
+        actionLabel="Clear filters"
+        onAction={() => setExtra(EMPTY_EXTRA_FILTERS)}
+      />
+    ) : search ? (
+      <EmptyState
+        variant="plain"
+        fill
+        showAnimation={false}
+        title={`No reports match "${search}"`}
+        description="Try a different word or clear the search."
+        actionLabel="Clear search"
+        onAction={() => setQuery('')}
+      />
+    ) : (
+      <EmptyState
+        variant="plain"
+        fill
+        title={
+          filter === 'ALL'
+            ? 'No reports yet'
+            : `No ${REPORT_FILTER_LABEL[filter].toLowerCase()} reports`
+        }
+        description={
+          filter === 'ALL'
+            ? 'Snap a photo of waste and AI will classify it.'
+            : 'Reports appear here when their status changes.'
+        }
+        actionLabel={filter === 'ALL' ? undefined : 'Show all'}
+        onAction={filter === 'ALL' ? undefined : () => setFilter('ALL')}
+      />
+    );
 
   return (
     <Screen contentContainerStyle={{ padding: 0, gap: 0 }}>
       <View style={{ paddingTop: spacing.lg, gap: spacing.md }}>
         <View style={{ paddingHorizontal: spacing.lg, gap: spacing.md }}>
           <ScreenHeader title="My Reports" subtitle={subtitle} />
-          <SearchField
-            value={query}
-            onChangeText={setQuery}
-            placeholder="Search descriptions"
-            accessibilityLabel="Search reports"
-          />
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing.sm,
+            }}
+          >
+            <SearchField
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Search descriptions"
+              accessibilityLabel="Search reports"
+              style={{ flex: 1 }}
+            />
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={
+                extraCount ? `Filters, ${extraCount} active` : 'Filters'
+              }
+              onPress={() => setFiltersOpen(true)}
+              style={({ pressed }) => ({
+                width: 48,
+                height: 48,
+                borderRadius: radius.md,
+                borderWidth: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderColor: extraCount
+                  ? colors.selectedBorder
+                  : colors.borderSubtle,
+                backgroundColor: extraCount
+                  ? colors.selectedBackground
+                  : pressed
+                    ? colors.surfaceHover
+                    : colors.inputBackground,
+              })}
+            >
+              <SlidersHorizontal
+                size={20}
+                color={
+                  extraCount ? colors.selectedForeground : colors.foreground
+                }
+              />
+              {extraCount ? (
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: -6,
+                    right: -6,
+                    minWidth: 20,
+                    height: 20,
+                    paddingHorizontal: 5,
+                    borderRadius: radius.pill,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: colors.primary,
+                  }}
+                >
+                  <AppText
+                    variant="caption"
+                    weight="semibold"
+                    color={colors.primaryForeground}
+                  >
+                    {extraCount}
+                  </AppText>
+                </View>
+              ) : null}
+            </Pressable>
+          </View>
         </View>
         <Segmented
           options={options}
@@ -139,6 +282,33 @@ export default function ReportsScreen() {
           scrollable
           inset={spacing.lg}
         />
+        {extraCount ? (
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              gap: spacing.sm,
+              paddingHorizontal: spacing.lg,
+            }}
+          >
+            {extra.category ? (
+              <ActiveFilterChip
+                label={WASTE_CATEGORY_LABEL[extra.category]}
+                onRemove={() =>
+                  setExtra((current) => ({ ...current, category: null }))
+                }
+              />
+            ) : null}
+            {extra.date !== 'any' ? (
+              <ActiveFilterChip
+                label={DATE_PRESET_LABEL[extra.date]}
+                onRemove={() =>
+                  setExtra((current) => ({ ...current, date: 'any' }))
+                }
+              />
+            ) : null}
+          </View>
+        ) : null}
       </View>
 
       {reports.isLoading ? (
@@ -236,6 +406,17 @@ export default function ReportsScreen() {
           }
         />
       )}
+      {filtersOpen ? (
+        <ReportFiltersSheet
+          visible
+          value={extra}
+          onClose={() => setFiltersOpen(false)}
+          onApply={(next) => {
+            setExtra(next);
+            setFiltersOpen(false);
+          }}
+        />
+      ) : null}
     </Screen>
   );
 }
