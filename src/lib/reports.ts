@@ -166,3 +166,16 @@ export function groupByDay<T extends { createdAt: string }>(
   }
   return sections;
 }
+
+export const WASTE_CATEGORIES: readonly WasteCategory[] = [
+  'ORGANIC_WASTE',
+  'PLASTIC_WASTE',
+  'PAPER_WASTE',
+];
+
+export function parseWasteCategory(value: unknown): WasteCategory | null {
+  return typeof value === 'string' &&
+    (WASTE_CATEGORIES as readonly string[]).includes(value)
+    ? (value as WasteCategory)
+    : null;
+}

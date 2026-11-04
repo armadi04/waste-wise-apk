@@ -4,6 +4,7 @@ import { Pressable, RefreshControl, View } from 'react-native';
 import { errorMessage } from '@/api/errors';
 import { useAuth } from '@/auth/auth-provider';
 import { DashboardHero } from '@/components/dashboard/dashboard-hero';
+import { CategoryBreakdown } from '@/components/dashboard/category-breakdown';
 import { StatusBreakdown } from '@/components/dashboard/status-breakdown';
 import { ReportListItem } from '@/components/reports/report-list-item';
 import { Avatar } from '@/components/ui/avatar';
@@ -85,6 +86,12 @@ export default function DashboardScreen() {
             stats={stats.data}
             onSelect={(status) =>
               router.push({ pathname: '/reports', params: { status } })
+            }
+          />
+          <CategoryBreakdown
+            stats={stats.data}
+            onSelect={(category) =>
+              router.push({ pathname: '/reports', params: { category } })
             }
           />
           <View style={{ gap: spacing.sm }}>

@@ -51,3 +51,12 @@ describe('report display mappings', () => {
     expect(mediaViewUrl(null)).toBeNull();
   });
 });
+
+describe('parseWasteCategory', () => {
+  it('accepts known categories only', async () => {
+    const { parseWasteCategory } = await import('@/lib/reports');
+    expect(parseWasteCategory('PAPER_WASTE')).toBe('PAPER_WASTE');
+    expect(parseWasteCategory('GLASS')).toBeNull();
+    expect(parseWasteCategory(undefined)).toBeNull();
+  });
+});

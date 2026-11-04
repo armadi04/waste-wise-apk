@@ -24,6 +24,7 @@ jest.mock('@/hooks/use-reports', () => ({
       inProgress: 2,
       completed: 6,
       rejected: 1,
+      byCategory: { organic: 4, plastic: 5, paper: 2, unclassified: 1 },
       recentReports: [],
     },
   }),
@@ -92,6 +93,18 @@ describe('dashboard screen', () => {
     expect(router.push).toHaveBeenCalledWith({
       pathname: '/reports',
       params: { status: 'PENDING' },
+    });
+  });
+
+  it('breaks reports down by category and deep-links the filter', async () => {
+    await render(<DashboardScreen />);
+    expect(screen.getByText('By category')).toBeTruthy();
+    expect(screen.getByLabelText('Unclassified: 1 reports')).toBeTruthy();
+
+    fireEvent.press(screen.getByLabelText('Plastic Waste: 5 reports'));
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/reports',
+      params: { category: 'PLASTIC_WASTE' },
     });
   });
 });

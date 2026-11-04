@@ -33,7 +33,7 @@ export function ReportStatusBadge({ status }: { status: ReportStatus }) {
   );
 }
 
-const CATEGORY_ICON: Record<WasteCategory, LucideIcon> = {
+export const CATEGORY_ICON: Record<WasteCategory, LucideIcon> = {
   ORGANIC_WASTE: Leaf,
   PLASTIC_WASTE: CupSoda,
   PAPER_WASTE: Newspaper,
@@ -44,6 +44,8 @@ export function categoryLabel(category: WasteCategory | null): string {
 }
 
 /** Category as icon + colored text. Never a pill, so it cannot read as a status. */
+export const UNCLASSIFIED_ICON = CircleHelp;
+
 export function CategoryLabel({
   category,
 }: {
