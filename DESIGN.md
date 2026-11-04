@@ -143,6 +143,35 @@ communicate status through color alone.
 | `info-solid-pressed`       | #134E4A | #134E4A |
 | `info-solid-foreground`    | #FFFFFF | #FFFFFF |
 
+### Report status and waste category
+
+Report status uses a soft pill with a leading dot plus its label. Category is never a pill:
+it renders as a category icon plus colored text, so the two can never be confused.
+
+| Status      | Tone       |
+| ----------- | ---------- |
+| Pending     | `warning`  |
+| In Progress | `progress` |
+| Completed   | `success`  |
+| Rejected    | `danger`   |
+
+`info` teal is reserved for alerts and brand moments; it collides with `primary` and the
+selected state, so do not use it for report status or category.
+
+| Application token               | Light   | Dark    |
+| ------------------------------- | ------- | ------- |
+| `progress`                      | #1D4ED8 | #60A5FA |
+| `progress-background`           | #EFF6FF | #172554 |
+| `progress-foreground`           | #1E40AF | #BFDBFE |
+| `progress-border`               | #3B82F6 | #60A5FA |
+| `category-organic` (Leaf)       | #15803D | #4ADE80 |
+| `category-plastic` (CupSoda)    | #A16207 | #FACC15 |
+| `category-paper` (Newspaper)    | #1D4ED8 | #93C5FD |
+| `category-unknown` (CircleHelp) | #52525B | #D4D4D8 |
+
+Category hues follow the Indonesian bin convention (organik hijau, anorganik kuning, kertas
+biru). `__tests__/unit/theme-tokens.test.ts` enforces token parity and 4.5:1 contrast.
+
 ### Component mapping
 
 | Mobile primitive        | Color and state rule                                                                                                                 |
@@ -213,6 +242,9 @@ supports them. Long list rows use truncation plus accessible full content where 
   Status rows deep-link to My Reports with a `status` param.
 - The tab bar adds the bottom safe-area inset to its height and uses `selected*` tokens
   plus an active-indicator pill, so the active tab is not color-only.
+- Report lists group items by local day (Today, Yesterday, date), show relative times on
+  rows, debounce search by 300 ms and end with an "all caught up" marker. Filter chips
+  show counts only when greater than zero.
 - Long forms (Create Report) put the submit action in the `Screen` `footer` slot. The footer
   shows requirement chips (icon + label, not color only) and names the first missing item
   under a disabled button; while submitting, the button label carries the stage.
