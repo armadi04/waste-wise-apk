@@ -27,11 +27,22 @@ export const WASTE_CATEGORY_LABEL: Record<WasteCategory, string> = {
   PAPER_WASTE: 'Paper Waste',
 };
 
-export const WASTE_CATEGORY_TONE: Record<WasteCategory, Tone> = {
-  ORGANIC_WASTE: 'success',
-  PLASTIC_WASTE: 'info',
-  PAPER_WASTE: 'warning',
-};
+/** Category text/icon color; categories never reuse status tones. */
+export function categoryColor(
+  colors: ThemeColors,
+  category: WasteCategory | null,
+): string {
+  switch (category) {
+    case 'ORGANIC_WASTE':
+      return colors.categoryOrganic;
+    case 'PLASTIC_WASTE':
+      return colors.categoryPlastic;
+    case 'PAPER_WASTE':
+      return colors.categoryPaper;
+    default:
+      return colors.categoryUnknown;
+  }
+}
 
 export const REPORT_FILTER_LABEL = {
   ALL: 'All',

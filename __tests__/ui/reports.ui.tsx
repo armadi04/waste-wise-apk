@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 import ReportsScreen from '../../app/(tabs)/reports';
 
@@ -14,7 +14,7 @@ jest.mock('expo-router', () => {
 });
 
 jest.mock('@/hooks/use-reports', () => {
-  const empty = {
+  const state = {
     isLoading: false,
     isError: false,
     isRefetching: false,
@@ -22,10 +22,10 @@ jest.mock('@/hooks/use-reports', () => {
     hasNextPage: false,
     refetch: jest.fn(),
     fetchNextPage: jest.fn(),
-    data: { pages: [{ data: [], meta: { total: 0, page: 1, lastPage: 1 } }] },
+    data: { pages: [{ data: [] as unknown[], meta: {} }] },
   };
   return {
-    useReports: () => empty,
+    useReports: jest.fn(() => state),
     useReportStats: () => ({
       data: {
         total: 4,
@@ -36,6 +36,7 @@ jest.mock('@/hooks/use-reports', () => {
         recentReports: [],
       },
     }),
+    __state: state,
   };
 });
 
@@ -82,11 +83,32 @@ jest.mock('lucide-react-native', () => {
 const router = (
   jest.requireMock('expo-router') as { __router: { push: jest.Mock } }
 ).__router;
+const hooks = jest.requireMock('@/hooks/use-reports') as {
+  useReports: jest.Mock;
+  __state: { data: { pages: { data: unknown[] }[] } };
+};
+
+function report(id: number, createdAt: Date) {
+  return {
+    id,
+    description: `Report ${id}`,
+    status: 'PENDING',
+    predictedCategory: 'PLASTIC_WASTE',
+    createdAt: createdAt.toISOString(),
+    media: null,
+  };
+}
+
+function setItems(items: unknown[]) {
+  hooks.__state.data = { pages: [{ data: items }] };
+}
 
 describe('reports screen', () => {
   beforeEach(() => {
     router.push.mockReset();
+    hooks.useReports.mockClear();
     delete mockParams.status;
+    setItems([]);
   });
 
   it('preselects the filter from the status param', async () => {
@@ -96,6 +118,12 @@ describe('reports screen', () => {
       screen.getByRole('tab', { name: 'Pending, 3', selected: true }),
     ).toBeTruthy();
     expect(screen.getByText('No pending reports')).toBeTruthy();
+  });
+
+  it('hides zero counts on filter chips', async () => {
+    await render(<ReportsScreen />);
+    expect(screen.getByRole('tab', { name: 'Completed' })).toBeTruthy();
+    expect(screen.queryByText('Completed · 0')).toBeNull();
   });
 
   it('resets to All from the filtered empty state', async () => {
@@ -109,5 +137,45 @@ describe('reports screen', () => {
     await render(<ReportsScreen />);
     await fireEvent.press(screen.getByLabelText('New report'));
     expect(router.push).toHaveBeenCalledWith('/reports/create');
+  });
+
+  it('groups reports by day and shows the end of the list', async () => {
+    const now = new Date();
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    setItems([report(2, now), report(1, yesterday)]);
+    await render(<ReportsScreen />);
+
+    expect(screen.getByText('Today')).toBeTruthy();
+    expect(screen.getByText('Yesterday')).toBeTruthy();
+    expect(screen.getByText('Report 2')).toBeTruthy();
+    expect(screen.getAllByText('Plastic Waste')).toHaveLength(2);
+    expect(screen.getByText("You're all caught up")).toBeTruthy();
+  });
+
+  it('debounces the search term and offers to clear it', async () => {
+    jest.useFakeTimers();
+    try {
+      await render(<ReportsScreen />);
+      await fireEvent.changeText(
+        screen.getByLabelText('Search reports'),
+        'bottle',
+      );
+      expect(hooks.useReports).not.toHaveBeenLastCalledWith('ALL', 'bottle');
+
+      await act(async () => {
+        jest.advanceTimersByTime(300);
+      });
+      expect(hooks.useReports).toHaveBeenLastCalledWith('ALL', 'bottle');
+      expect(screen.getByText('No reports match "bottle"')).toBeTruthy();
+
+      await fireEvent.press(screen.getAllByLabelText('Clear search')[0]!);
+      await act(async () => {
+        jest.advanceTimersByTime(300);
+      });
+      expect(hooks.useReports).toHaveBeenLastCalledWith('ALL', '');
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });

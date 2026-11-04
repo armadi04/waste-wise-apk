@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'bun:test';
 
 import { mediaViewUrl } from '@/lib/media-url';
+import { lightColors } from '@/theme/tokens';
 import {
   REPORT_STATUS_LABEL,
   REPORT_STATUS_TONE,
   WASTE_CATEGORY_LABEL,
-  WASTE_CATEGORY_TONE,
+  categoryColor,
 } from '@/lib/reports';
 import type { Media, ReportStatus, WasteCategory } from '@/types/domain';
 
@@ -34,7 +35,10 @@ describe('report display mappings', () => {
     ];
     for (const category of categories) {
       expect(WASTE_CATEGORY_LABEL[category]).toBeTruthy();
-      expect(WASTE_CATEGORY_TONE[category]).toBeTruthy();
+      expect(categoryColor(lightColors, category)).toBeTruthy();
+      expect(categoryColor(lightColors, category)).not.toBe(
+        categoryColor(lightColors, null),
+      );
     }
   });
 
