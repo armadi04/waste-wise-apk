@@ -213,6 +213,11 @@ supports them. Long list rows use truncation plus accessible full content where 
   Status rows deep-link to My Reports with a `status` param.
 - The tab bar adds the bottom safe-area inset to its height and uses `selected*` tokens
   plus an active-indicator pill, so the active tab is not color-only.
+- Long forms (Create Report) put the submit action in the `Screen` `footer` slot. The footer
+  shows requirement chips (icon + label, not color only) and names the first missing item
+  under a disabled button; while submitting, the button label carries the stage.
+- Create Report requests GPS on entry because location is mandatory. Show loading, captured
+  and error states inline, with "Try again" and "Settings" as the recovery path.
 - When a stored session cannot be restored because of a transient failure, keep the tokens and
   show a retry screen; clear tokens only for an invalid or expired session.
 - Two-factor verification is a second auth step. Keep the challenge token in memory only, show a
