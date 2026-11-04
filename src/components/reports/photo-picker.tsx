@@ -14,6 +14,7 @@ export function PhotoPicker({
   onCamera,
   onGallery,
   onClear,
+  clearable = true,
 }: {
   uri: string | null;
   preparing: boolean;
@@ -22,6 +23,8 @@ export function PhotoPicker({
   onCamera: () => void;
   onGallery: () => void;
   onClear: () => void;
+  /** Hide the remove button, e.g. while showing an existing report photo. */
+  clearable?: boolean;
 }) {
   const { colors, radius, spacing } = useTheme();
 
@@ -42,26 +45,28 @@ export function PhotoPicker({
             contentFit="cover"
             accessibilityLabel="Selected report photo"
           />
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Remove selected photo"
-            onPress={onClear}
-            disabled={disabled}
-            hitSlop={4}
-            style={({ pressed }) => ({
-              position: 'absolute',
-              right: spacing.md,
-              top: spacing.md,
-              width: 44,
-              height: 44,
-              borderRadius: radius.pill,
-              backgroundColor: pressed ? colors.surfaceHover : colors.surface,
-              alignItems: 'center',
-              justifyContent: 'center',
-            })}
-          >
-            <X size={20} color={colors.foreground} />
-          </Pressable>
+          {clearable ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Remove selected photo"
+              onPress={onClear}
+              disabled={disabled}
+              hitSlop={4}
+              style={({ pressed }) => ({
+                position: 'absolute',
+                right: spacing.md,
+                top: spacing.md,
+                width: 44,
+                height: 44,
+                borderRadius: radius.pill,
+                backgroundColor: pressed ? colors.surfaceHover : colors.surface,
+                alignItems: 'center',
+                justifyContent: 'center',
+              })}
+            >
+              <X size={20} color={colors.foreground} />
+            </Pressable>
+          ) : null}
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Retake photo"

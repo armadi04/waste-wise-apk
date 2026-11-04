@@ -61,7 +61,8 @@ function RootNavigator() {
         <Stack.Protected guard={status === 'authenticated'} redirectTo="/login">
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="reports/create" />
-          <Stack.Screen name="reports/[id]" />
+          <Stack.Screen name="reports/[id]/index" />
+          <Stack.Screen name="reports/[id]/edit" />
         </Stack.Protected>
         <Stack.Protected guard={status !== 'authenticated'}>
           <Stack.Screen name="(auth)" />

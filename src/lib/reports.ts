@@ -217,3 +217,19 @@ export function dateRangeFor(
       return {};
   }
 }
+
+/**
+ * Owners may edit or delete a report only while it is still Pending,
+ * mirroring the web `canEdit`/`canDelete` rule (`reports.*.own`).
+ */
+export function canModifyReport(
+  report: { reporterId: number; status: ReportStatus },
+  userId: number | null | undefined,
+): boolean {
+  return (
+    userId !== null &&
+    userId !== undefined &&
+    report.reporterId === userId &&
+    report.status === 'PENDING'
+  );
+}

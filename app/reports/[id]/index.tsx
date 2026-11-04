@@ -1,23 +1,35 @@
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { CalendarClock, ImageOff, MapPin, Sparkles } from 'lucide-react-native';
+import {
+  CalendarClock,
+  ImageOff,
+  MapPin,
+  Pencil,
+  Sparkles,
+  Trash2,
+} from 'lucide-react-native';
+import { useState } from 'react';
 import { RefreshControl, View } from 'react-native';
 
 import { errorMessage } from '@/api/errors';
+import { useAuth } from '@/auth/auth-provider';
 import {
   CategoryBadge,
   ClassificationStatusBadge,
   ConfidenceText,
   ReportStatusBadge,
 } from '@/components/reports/report-badges';
+import { InlineAlert } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Dialog } from '@/components/ui/dialog';
 import { Screen, ScreenHeader } from '@/components/ui/layout';
 import { ErrorState, LoadingState } from '@/components/ui/states';
 import { AppText } from '@/components/ui/text';
-import { useReportDetail } from '@/hooks/use-reports';
+import { useDeleteReport, useReportDetail } from '@/hooks/use-reports';
 import { formatCoordinate, formatDateTime } from '@/lib/format';
 import { mediaViewUrl } from '@/lib/media-url';
-import { CLASSIFICATION_ERROR_LABEL } from '@/lib/reports';
+import { canModifyReport, CLASSIFICATION_ERROR_LABEL } from '@/lib/reports';
 import { useTheme } from '@/theme';
 
 export default function ReportDetailScreen() {
@@ -26,8 +38,25 @@ export default function ReportDetailScreen() {
   const params = useLocalSearchParams<{ id: string }>();
   const id = Number(params.id);
   const detail = useReportDetail(id);
+  const { user } = useAuth();
+  const removeReport = useDeleteReport();
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const report = detail.data;
+  const editable = report ? canModifyReport(report, user?.id) : false;
+
+  const handleDelete = async () => {
+    setDeleteError(null);
+    try {
+      await removeReport.mutateAsync(id);
+      setConfirmingDelete(false);
+      router.replace('/reports');
+    } catch (error) {
+      setConfirmingDelete(false);
+      setDeleteError(errorMessage(error));
+    }
+  };
   const photoUri = mediaViewUrl(report?.media);
 
   if (!Number.isInteger(id) || id <= 0) {
@@ -116,8 +145,40 @@ export default function ReportDetailScreen() {
             </View>
             <AppText variant="cardTitle">{report.description}</AppText>
             <AppText variant="caption" color={colors.mutedForeground}>
-              Report status is managed by WasteWise administrators.
+              {editable
+                ? 'You can edit or delete this report while it is Pending.'
+                : 'Report status is managed by WasteWise administrators.'}
             </AppText>
+            {editable ? (
+              <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+                <Button
+                  label="Edit"
+                  variant="outline"
+                  icon={<Pencil size={16} color={colors.foreground} />}
+                  onPress={() =>
+                    router.push({
+                      pathname: '/reports/[id]/edit',
+                      params: { id: String(id) },
+                    })
+                  }
+                  style={{ flex: 1 }}
+                />
+                <Button
+                  label="Delete"
+                  variant="danger-outline"
+                  icon={<Trash2 size={16} color={colors.danger} />}
+                  onPress={() => setConfirmingDelete(true)}
+                  style={{ flex: 1 }}
+                />
+              </View>
+            ) : null}
+            {deleteError ? (
+              <InlineAlert
+                title="Report not deleted"
+                message={deleteError}
+                testID="delete-error"
+              />
+            ) : null}
           </Card>
 
           <Card style={{ gap: spacing.md }}>
@@ -215,6 +276,18 @@ export default function ReportDetailScreen() {
           </Card>
         </>
       ) : null}
+      <Dialog
+        visible={confirmingDelete}
+        tone="danger"
+        icon={(color) => <Trash2 size={26} color={color} />}
+        title="Delete this report?"
+        message="The report and its AI result will be removed. This cannot be undone."
+        confirmLabel="Delete report"
+        loading={removeReport.isPending}
+        loadingLabel="Deleting…"
+        onConfirm={() => void handleDelete()}
+        onCancel={() => setConfirmingDelete(false)}
+      />
     </Screen>
   );
 }

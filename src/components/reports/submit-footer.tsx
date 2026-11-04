@@ -31,14 +31,18 @@ const REQUIREMENTS: {
   },
 ];
 
-export function stageLabel(stage: SubmitStage, uploadPercent: number): string {
+export function stageLabel(
+  stage: SubmitStage,
+  uploadPercent: number,
+  savingLabel = 'Classifying with AI…',
+): string {
   if (stage === 'uploading') {
     return uploadPercent
       ? `Uploading photo · ${uploadPercent}%`
       : 'Uploading photo…';
   }
-  if (stage === 'creating') return 'Classifying with AI…';
-  return 'Submit report';
+  if (stage === 'creating') return savingLabel;
+  return '';
 }
 
 export function SubmitFooter({
@@ -47,6 +51,9 @@ export function SubmitFooter({
   uploadPercent,
   blocked,
   onSubmit,
+  submitLabel = 'Submit report',
+  savingLabel,
+  readyCaption = 'AI classifies the photo on submit. Your report starts as Pending.',
 }: {
   requirements: SubmitRequirements;
   stage: SubmitStage;
@@ -54,6 +61,10 @@ export function SubmitFooter({
   /** Extra reason the button cannot be pressed, e.g. a photo is preparing. */
   blocked?: boolean;
   onSubmit: () => void;
+  submitLabel?: string;
+  /** Button label while the report request runs (after any upload). */
+  savingLabel?: string;
+  readyCaption?: string;
 }) {
   const { colors, radius, spacing } = useTheme();
   const busy = stage !== 'idle';
@@ -62,7 +73,7 @@ export function SubmitFooter({
     ? 'Keep this screen open until it finishes.'
     : firstMissing
       ? firstMissing.missing
-      : 'AI classifies the photo on submit. Your report starts as Pending.';
+      : readyCaption;
 
   return (
     <>
@@ -101,10 +112,10 @@ export function SubmitFooter({
         })}
       </View>
       <Button
-        label="Submit report"
+        label={submitLabel}
         fullWidth
         loading={busy}
-        loadingLabel={stageLabel(stage, uploadPercent)}
+        loadingLabel={stageLabel(stage, uploadPercent, savingLabel)}
         disabled={Boolean(firstMissing) || blocked}
         onPress={onSubmit}
       />

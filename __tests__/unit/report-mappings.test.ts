@@ -78,3 +78,19 @@ describe('dateRangeFor', () => {
     expect(dateRangeFor('year', now).from).toBe('2026-01-01');
   });
 });
+
+describe('canModifyReport', () => {
+  it('allows only the owner while pending', async () => {
+    const { canModifyReport } = await import('@/lib/reports');
+    expect(canModifyReport({ reporterId: 7, status: 'PENDING' }, 7)).toBe(true);
+    expect(canModifyReport({ reporterId: 7, status: 'IN_PROGRESS' }, 7)).toBe(
+      false,
+    );
+    expect(canModifyReport({ reporterId: 7, status: 'PENDING' }, 8)).toBe(
+      false,
+    );
+    expect(canModifyReport({ reporterId: 7, status: 'PENDING' }, null)).toBe(
+      false,
+    );
+  });
+});
