@@ -27,6 +27,7 @@ import {
 import { Segmented } from '@/components/ui/segmented';
 import { AppText } from '@/components/ui/text';
 import { useUnreadNotificationCount } from '@/hooks/use-notifications';
+import { useMySessions } from '@/hooks/use-sessions';
 import { useTwoFactorStatus } from '@/hooks/use-two-factor';
 import { capitalize } from '@/lib/format';
 import { useTheme } from '@/theme';
@@ -49,6 +50,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const unread = useUnreadNotificationCount().data ?? 0;
   const twoFactor = useTwoFactorStatus().data;
+  const sessionCount = useMySessions().data?.length;
   const version = Constants.expoConfig?.version;
   const role = user?.roles?.[0]?.name ?? 'user';
 
@@ -129,6 +131,7 @@ export default function ProfileScreen() {
           icon={MonitorSmartphone}
           title="Sessions"
           subtitle="Devices signed in to your account"
+          value={sessionCount ? String(sessionCount) : undefined}
           onPress={() => router.push('/profile/sessions')}
         />
       </ListGroup>

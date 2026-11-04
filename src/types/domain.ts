@@ -96,3 +96,5 @@ export interface TwoFactorSetup {
 export interface RecoveryCodes {
   recoveryCodes: string[];
 }
+
+export type OwnSession = components['schemas']['OwnSessionResponse'];
