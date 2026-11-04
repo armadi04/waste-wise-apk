@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 
-import { capitalize, greeting } from '@/lib/format';
+import { capitalize, greeting, roundCoordinate } from '@/lib/format';
 import { parseReportFilter } from '@/lib/reports';
 
 describe('greeting', () => {
@@ -25,5 +25,12 @@ describe('parseReportFilter', () => {
     expect(parseReportFilter('ALL')).toBe('ALL');
     expect(parseReportFilter('bogus')).toBeNull();
     expect(parseReportFilter(undefined)).toBeNull();
+  });
+});
+
+describe('roundCoordinate', () => {
+  it('limits coordinates to 6 decimal places', () => {
+    expect(roundCoordinate(-6.2000001234567)).toBe(-6.2);
+    expect(roundCoordinate(106.8456789123)).toBe(106.845679);
   });
 });

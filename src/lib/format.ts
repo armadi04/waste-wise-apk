@@ -32,3 +32,8 @@ export function greeting(date: Date = new Date()): string {
 export function capitalize(value: string): string {
   return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
 }
+
+/** Backend rejects coordinates with more than 6 decimal places. */
+export function roundCoordinate(value: number): number {
+  return Math.round(value * 1e6) / 1e6;
+}

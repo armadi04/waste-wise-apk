@@ -22,6 +22,7 @@ import { TextField } from '@/components/ui/field';
 import { Screen, ScreenHeader, SectionHeader } from '@/components/ui/layout';
 import { AppText } from '@/components/ui/text';
 import { useCreateReport } from '@/hooks/use-reports';
+import { roundCoordinate } from '@/lib/format';
 import { prepareReportImage } from '@/lib/image';
 import { reportSchema, type ReportFormValues } from '@/lib/validation/report';
 import { useTheme } from '@/theme';
@@ -223,8 +224,8 @@ export default function CreateReportScreen() {
       const report = await createReport.mutateAsync({
         description: values.description,
         mediaId: currentMediaId,
-        latitude: location.latitude,
-        longitude: location.longitude,
+        latitude: roundCoordinate(location.latitude),
+        longitude: roundCoordinate(location.longitude),
       });
 
       setSubmitStage('idle');
