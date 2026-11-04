@@ -29,12 +29,16 @@ export function EmptyState({
   actionLabel,
   onAction,
   showAnimation = true,
+  variant = 'bordered',
+  fill = false,
 }: {
   title: string;
   description: string;
   actionLabel?: string;
   onAction?: () => void;
   showAnimation?: boolean;
+  variant?: 'bordered' | 'plain';
+  fill?: boolean;
 }) {
   const { colors, spacing, radius } = useTheme();
   return (
@@ -44,10 +48,15 @@ export function EmptyState({
         justifyContent: 'center',
         padding: spacing.xxxl,
         gap: spacing.sm,
-        borderWidth: 1,
-        borderStyle: 'dashed',
-        borderColor: colors.borderSubtle,
-        borderRadius: radius.lg,
+        ...(fill ? { flex: 1 } : null),
+        ...(variant === 'bordered'
+          ? {
+              borderWidth: 1,
+              borderStyle: 'dashed' as const,
+              borderColor: colors.borderSubtle,
+              borderRadius: radius.lg,
+            }
+          : null),
       }}
     >
       {showAnimation ? (

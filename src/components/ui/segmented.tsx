@@ -7,6 +7,7 @@ import { AppText } from './text';
 interface Option<T extends string> {
   label: string;
   value: T;
+  count?: number;
 }
 
 export function Segmented<T extends string>({
@@ -14,11 +15,13 @@ export function Segmented<T extends string>({
   value,
   onChange,
   scrollable,
+  inset = 0,
 }: {
   options: Option<T>[];
   value: T;
   onChange: (value: T) => void;
   scrollable?: boolean;
+  inset?: number;
 }) {
   const { colors, radius, spacing } = useTheme();
 
@@ -54,7 +57,9 @@ export function Segmented<T extends string>({
               }
               weight={active ? 'semibold' : 'medium'}
             >
-              {option.label}
+              {option.count === undefined
+                ? option.label
+                : `${option.label} · ${option.count}`}
             </AppText>
           </Pressable>
         );
@@ -64,7 +69,11 @@ export function Segmented<T extends string>({
 
   if (!scrollable) return content;
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{ paddingHorizontal: inset }}
+    >
       {content}
     </ScrollView>
   );
