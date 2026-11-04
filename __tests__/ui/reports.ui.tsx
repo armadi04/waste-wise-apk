@@ -93,7 +93,7 @@ describe('reports screen', () => {
     mockParams.status = 'PENDING';
     await render(<ReportsScreen />);
     expect(
-      screen.getByRole('tab', { name: 'Pending · 3', selected: true }),
+      screen.getByRole('tab', { name: 'Pending, 3', selected: true }),
     ).toBeTruthy();
     expect(screen.getByText('No pending reports')).toBeTruthy();
   });

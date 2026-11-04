@@ -1,4 +1,4 @@
-import { Pressable, ScrollView } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 
 import { useTheme } from '@/theme';
 
@@ -37,30 +37,56 @@ export function Segmented<T extends string>({
             key={option.value}
             accessibilityRole="tab"
             accessibilityState={{ selected: active }}
+            accessibilityLabel={
+              option.count ? `${option.label}, ${option.count}` : option.label
+            }
             onPress={() => onChange(option.value)}
-            style={{
+            hitSlop={{ top: 6, bottom: 6 }}
+            style={({ pressed }) => ({
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: spacing.xs + 2,
               paddingHorizontal: spacing.md,
-              minHeight: 40,
-              justifyContent: 'center',
+              minHeight: 36,
               borderRadius: radius.pill,
               borderWidth: 1,
               borderColor: active ? colors.selectedBorder : colors.borderSubtle,
               backgroundColor: active
                 ? colors.selectedBackground
-                : colors.surface,
-            }}
+                : pressed
+                  ? colors.surfaceHover
+                  : colors.surface,
+            })}
           >
             <AppText
               variant="label"
-              color={
-                active ? colors.selectedForeground : colors.mutedForeground
-              }
+              color={active ? colors.selectedForeground : colors.foreground}
               weight={active ? 'semibold' : 'medium'}
             >
-              {option.count === undefined
-                ? option.label
-                : `${option.label} · ${option.count}`}
+              {option.label}
             </AppText>
+            {option.count ? (
+              <View
+                style={{
+                  minWidth: 20,
+                  paddingHorizontal: 6,
+                  borderRadius: radius.pill,
+                  alignItems: 'center',
+                  backgroundColor: active ? colors.surface : colors.muted,
+                }}
+              >
+                <AppText
+                  variant="caption"
+                  weight="semibold"
+                  color={
+                    active ? colors.selectedForeground : colors.mutedForeground
+                  }
+                  style={{ fontVariant: ['tabular-nums'] }}
+                >
+                  {option.count}
+                </AppText>
+              </View>
+            ) : null}
           </Pressable>
         );
       })}
@@ -72,7 +98,8 @@ export function Segmented<T extends string>({
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={{ paddingHorizontal: inset }}
+      style={{ flexGrow: 0 }}
+      contentContainerStyle={{ paddingHorizontal: inset, paddingVertical: 6 }}
     >
       {content}
     </ScrollView>
