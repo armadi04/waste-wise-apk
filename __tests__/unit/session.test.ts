@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'bun:test';
 
 import { ApiError } from '@/api/errors';
-import { isAuthRoute, isInvalidSessionError } from '@/api/session';
+import {
+  isAuthRoute,
+  isCodeRejection,
+  isInvalidSessionError,
+} from '@/api/session';
 
 describe('session error detection', () => {
   it('treats 401 and 403 as invalid sessions', () => {
@@ -27,5 +31,18 @@ describe('auth route detection', () => {
   it('keeps authenticated routes refreshable', () => {
     expect(isAuthRoute('/reports')).toBe(false);
     expect(isAuthRoute('/auth/profile')).toBe(false);
+  });
+});
+
+describe('code rejection detection', () => {
+  it('recognises rejected 2FA codes', () => {
+    expect(isCodeRejection({ message: 'That code is not valid' })).toBe(true);
+    expect(isCodeRejection({ code: 'TWO_FACTOR_INVALID_CODE' })).toBe(true);
+  });
+
+  it('leaves expired-token 401s refreshable', () => {
+    expect(isCodeRejection({ message: 'Unauthorized' })).toBe(false);
+    expect(isCodeRejection(undefined)).toBe(false);
+    expect(isCodeRejection('nope')).toBe(false);
   });
 });

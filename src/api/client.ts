@@ -13,7 +13,7 @@ import {
 import { API_BASE_URL } from '@/lib/config';
 
 import { ApiError, toApiError } from './errors';
-import { isAuthRoute, isInvalidSessionError } from './session';
+import { isAuthRoute, isCodeRejection, isInvalidSessionError } from './session';
 
 type UnauthorizedHandler = () => void | Promise<void>;
 
@@ -84,7 +84,13 @@ api.interceptors.response.use(
     const original = error.config as
       (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
     const url = original?.url ?? '';
-    if (status === 401 && original && !original._retry && !isAuthRoute(url)) {
+    if (
+      status === 401 &&
+      original &&
+      !original._retry &&
+      !isAuthRoute(url) &&
+      !isCodeRejection(error.response?.data)
+    ) {
       original._retry = true;
       try {
         const accessToken = await refreshAccessToken();
