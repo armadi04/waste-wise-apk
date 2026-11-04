@@ -1,9 +1,13 @@
-import { StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 
-import { Button } from '@/components/ui/button';
 import { GoogleIcon } from '@/components/ui/google-icon';
+import { AppText } from '@/components/ui/text';
 import { useTheme } from '@/theme';
 
+/**
+ * "Continue with Google" button following Google's sign-in branding: neutral
+ * light/dark fill with an outline, the full-colour G mark (no badge), pill shape.
+ */
 export function GoogleSignInButton({
   label,
   loadingLabel,
@@ -17,36 +21,54 @@ export function GoogleSignInButton({
   loading: boolean;
   disabled: boolean;
 }) {
-  const { colors, radius } = useTheme();
+  const { colors, radius, spacing, fontFamily } = useTheme();
+  const inactive = disabled || loading;
+  const foreground = disabled
+    ? colors.disabledForeground
+    : colors.googleButtonForeground;
 
   return (
-    <Button
+    <Pressable
       testID="google-sign-in-button"
-      label={label}
-      loadingLabel={loadingLabel}
-      loading={loading}
-      disabled={disabled}
-      onPress={onPress}
-      fullWidth
+      accessibilityRole="button"
+      accessibilityLabel={loading ? loadingLabel : label}
       accessibilityHint="Opens the Google account picker"
-      icon={
-        <View
-          style={[styles.mark, { backgroundColor: colors.primaryForeground }]}
-        >
-          <GoogleIcon size={17} />
+      accessibilityState={{ disabled: inactive, busy: loading }}
+      disabled={inactive}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        minHeight: 56,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: spacing.md,
+        paddingHorizontal: spacing.xl,
+        borderRadius: radius.pill,
+        borderWidth: 1,
+        borderColor: disabled
+          ? colors.disabledBorder
+          : colors.googleButtonBorder,
+        backgroundColor: disabled
+          ? colors.disabledBackground
+          : pressed
+            ? colors.googleButtonPressed
+            : colors.googleButtonBackground,
+      })}
+    >
+      {loading ? (
+        <ActivityIndicator size="small" color={foreground} />
+      ) : (
+        <View style={{ opacity: disabled ? 0.38 : 1 }}>
+          <GoogleIcon size={20} />
         </View>
-      }
-      style={{ borderRadius: radius.lg, minHeight: 56 }}
-    />
+      )}
+      <AppText
+        variant="button"
+        color={foreground}
+        style={{ fontFamily: fontFamily.semibold }}
+      >
+        {loading ? loadingLabel : label}
+      </AppText>
+    </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  mark: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
