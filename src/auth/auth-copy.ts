@@ -3,14 +3,11 @@ export const authCopy = {
   tagline: 'REPORT · CLASSIFY · MANAGE',
   title: 'Welcome to WasteWise',
   subtitle:
-    'Sign in to report waste, follow your impact, and help keep your city clean.',
-  sheetTitle: 'Sign in to continue',
-  sheetBody: 'No password needed. Use your Google account to continue.',
-  newHere:
-    'New to WasteWise? Your account is created automatically on first sign-in.',
+    'Snap a photo of waste, let AI sort it, and follow it until it’s cleaned up.',
+  reassurance:
+    'No password needed. New accounts are created automatically on first sign-in.',
   cta: 'Continue with Google',
   loading: 'Signing in…',
-  trust: 'Your reports stay private to your Google account.',
   devConfigWarning:
     'Google Sign-In is not configured. Set EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID before building the app.',
   configUnavailable:

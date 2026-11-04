@@ -39,12 +39,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <AuthScreen>
-      <View style={{ gap: spacing.sm }}>
-        <AppText variant="sectionTitle">{authCopy.sheetTitle}</AppText>
-        <AppText color={colors.mutedForeground}>{authCopy.sheetBody}</AppText>
-      </View>
-
+    <AuthScreen illustration>
       {!IS_GOOGLE_CONFIGURED ? (
         <InlineAlert
           tone="warning"
@@ -53,39 +48,34 @@ export default function LoginScreen() {
         />
       ) : null}
 
-      <View style={{ gap: spacing.sm }}>
-        <GoogleSignInButton
-          label={authCopy.cta}
-          loadingLabel={authCopy.loading}
-          onPress={() => void handleSignIn()}
-          loading={isSigningIn}
-          disabled={!IS_GOOGLE_CONFIGURED}
-        />
-        <AppText variant="caption" color={colors.mutedForeground}>
-          {authCopy.newHere}
-        </AppText>
-      </View>
+      <GoogleSignInButton
+        label={authCopy.cta}
+        loadingLabel={authCopy.loading}
+        onPress={() => void handleSignIn()}
+        loading={isSigningIn}
+        disabled={!IS_GOOGLE_CONFIGURED}
+      />
 
-      {error ? (
-        <InlineAlert tone="danger" message={error} testID="auth-error" />
-      ) : null}
-
-      <View style={[styles.trustRow, { gap: spacing.sm }]}>
+      <View style={[styles.reassurance, { gap: spacing.sm }]}>
         <ShieldCheck size={16} color={colors.mutedForeground} />
         <AppText
           variant="caption"
           color={colors.mutedForeground}
           style={{ flex: 1 }}
         >
-          {authCopy.trust}
+          {authCopy.reassurance}
         </AppText>
       </View>
+
+      {error ? (
+        <InlineAlert tone="danger" message={error} testID="auth-error" />
+      ) : null}
     </AuthScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  trustRow: {
+  reassurance: {
     flexDirection: 'row',
     alignItems: 'flex-start',
   },

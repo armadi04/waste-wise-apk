@@ -86,9 +86,14 @@ describe('login screen', () => {
     expect(screen.getByText('Continue with Google')).toBeTruthy();
     expect(
       screen.getByText(
-        'New to WasteWise? Your account is created automatically on first sign-in.',
+        'No password needed. New accounts are created automatically on first sign-in.',
       ),
     ).toBeTruthy();
+    expect(screen.queryByText('Sign in to continue')).toBeNull();
+    expect(
+      screen.getByTestId('auth-illustration', { includeHiddenElements: true })
+        .props.importantForAccessibility,
+    ).toBe('no-hide-descendants');
     expect(screen.queryByText('Sign up')).toBeNull();
     expect(screen.queryByText('Log In')).toBeNull();
   });

@@ -91,6 +91,11 @@ describe('two-factor screen', () => {
     expect(screen.getByText('Verify it’s you')).toBeTruthy();
     expect(screen.getByText('Authentication code')).toBeTruthy();
     expect(screen.getByText('Verify code')).toBeTruthy();
+    expect(
+      screen.queryByTestId('auth-illustration', {
+        includeHiddenElements: true,
+      }),
+    ).toBeNull();
   });
 
   it('validates a short code before submitting', async () => {
