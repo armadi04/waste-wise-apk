@@ -236,12 +236,18 @@ supports them. Long list rows use truncation plus accessible full content where 
   instead of stretching it to fill the screen; the hero absorbs remaining height. Use
   `surface` for the dock so dark mode does not render a pure black plane. Anchor the CTA at the
   bottom of the dock for thumb reach.
-- Tab screens own exactly one primary CTA: the brand hero button on Home and the
-  extended FAB on My Reports. Do not duplicate it in the header or empty state.
+- "New report" is a global action: the circular `+` beside the floating tab bar. Home keeps
+  the hero "Report waste" button as its contextual CTA. Do not add FABs, header buttons or
+  empty-state buttons that duplicate it.
 - The Home hero uses the `brand` surface with `BrandBackdrop` and an `inverse` button.
   Status rows deep-link to My Reports with a `status` param.
-- The tab bar adds the bottom safe-area inset to its height and uses `selected*` tokens
-  plus an active-indicator pill, so the active tab is not color-only.
+- The tab bar is a floating capsule (`FloatingTabBar`): `surface` + `borderSubtle` +
+  `shadow`, `radius.pill`, 64 dp tall, offset above the bottom safe-area inset. The active
+  tab is a filled `selected-background` pill with `selected-foreground` icon and semibold
+  label, so it is not color-only. It hides while the keyboard is open.
+- Content scrolls behind the floating bar. `Screen` reserves the space automatically
+  through `TabBarInsetContext`; custom lists inside tabs pad their bottom with
+  `useTabBarInset()`.
 - Report lists group items by local day (Today, Yesterday, date), show relative times on
   rows, debounce search by 300 ms and end with an "all caught up" marker. Filter chips
   show counts only when greater than zero.
