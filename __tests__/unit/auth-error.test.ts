@@ -28,6 +28,14 @@ describe('auth error mapping', () => {
     );
   });
 
+  it('maps Google Play Services NETWORK_ERROR separately', () => {
+    expect(toAuthFailure(new Error('NETWORK_ERROR')).code).toBe(
+      'google_network',
+    );
+    const coded = Object.assign(new Error('7: unknown'), { code: '7' });
+    expect(toAuthFailure(coded).code).toBe('google_network');
+  });
+
   it('maps unavailable Play Services', () => {
     const error = Object.assign(new Error('Missing'), {
       code: 'PLAY_SERVICES_NOT_AVAILABLE',

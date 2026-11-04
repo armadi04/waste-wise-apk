@@ -7,6 +7,7 @@ export type AuthErrorCode =
   | 'account_locked'
   | 'account_inactive'
   | 'play_services_unavailable'
+  | 'google_network'
   | 'network'
   | 'server'
   | 'unauthorized'
@@ -28,6 +29,8 @@ const authFailureMessages: Record<AuthErrorCode, string> = {
     'This WasteWise account is inactive. Contact support if you need help.',
   play_services_unavailable:
     'Google Play Services is unavailable or needs an update.',
+  google_network:
+    'Google Sign-In couldn’t reach Google. Check your internet connection and try again.',
   network:
     'We couldn’t connect to WasteWise. Check your connection and try again.',
   server: 'WasteWise is temporarily unavailable. Please try again in a moment.',
@@ -51,6 +54,17 @@ function hasErrorCode(error: unknown, code: string): boolean {
   );
 }
 
+// Google Play Services reports connectivity failures as ApiException
+// NETWORK_ERROR (status code 7). This is not a WasteWise API failure.
+function isGoogleNetworkError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  const code = (error as Error & { code?: unknown }).code;
+  return (
+    (code === 7 || code === '7' || /NETWORK_ERROR/.test(error.message)) &&
+    !('isAxiosError' in error)
+  );
+}
+
 const apiCodeMap: Record<string, AuthErrorCode> = {
   TWO_FACTOR_INVALID_CODE: 'two_factor_invalid_code',
   TWO_FACTOR_CHALLENGE_EXPIRED: 'two_factor_challenge_expired',
@@ -62,6 +76,10 @@ const apiCodeMap: Record<string, AuthErrorCode> = {
 export function toAuthFailure(error: unknown): AuthFailure {
   if (hasErrorCode(error, 'PLAY_SERVICES_NOT_AVAILABLE')) {
     return authFailure('play_services_unavailable');
+  }
+
+  if (isGoogleNetworkError(error)) {
+    return authFailure('google_network');
   }
 
   const apiError = toApiError(error);
