@@ -1,0 +1,8 @@
+node_modules
+.git
+.expo
+dist
+android
+ios
+bun.lock
+src/types/api.generated.ts

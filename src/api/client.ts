@@ -1,20 +1,37 @@
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 import axios, {
   create as createAxios,
   type AxiosError,
   type InternalAxiosRequestConfig,
 } from 'axios';
 
-import { clearTokens, getCachedAccessToken, loadTokens, saveTokens } from '@/auth/token-storage';
+import {
+  clearTokens,
+  getCachedAccessToken,
+  loadTokens,
+  saveTokens,
+} from '@/auth/token-storage';
 import { API_BASE_URL } from '@/lib/config';
+import { buildUserAgent } from '@/lib/user-agent-header';
 
 import { ApiError, toApiError } from './errors';
+import { isAuthRoute, isCodeRejection, isInvalidSessionError } from './session';
 
 type UnauthorizedHandler = () => void | Promise<void>;
+
+const USER_AGENT = buildUserAgent(
+  Platform.constants as unknown as Record<string, unknown>,
+  Constants.expoConfig?.version,
+  Platform.OS,
+);
 
 let unauthorizedHandler: UnauthorizedHandler | null = null;
 let refreshing: Promise<string> | null = null;
 
-export function setUnauthorizedHandler(handler: UnauthorizedHandler | null): void {
+export function setUnauthorizedHandler(
+  handler: UnauthorizedHandler | null,
+): void {
   unauthorizedHandler = handler;
 }
 
@@ -39,6 +56,7 @@ async function refreshAccessToken(): Promise<string> {
         headers: {
           'Content-Type': 'application/json',
           'X-Client': 'WasteWise-Mobile',
+          'User-Agent': USER_AGENT,
         },
       },
     );
@@ -57,11 +75,13 @@ const api = createAxios({
   timeout: 30_000,
   headers: {
     'X-Client': 'WasteWise-Mobile',
+    'User-Agent': USER_AGENT,
   },
 });
 
 api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
-  const accessToken = getCachedAccessToken() ?? (await loadTokens())?.accessToken;
+  const accessToken =
+    getCachedAccessToken() ?? (await loadTokens())?.accessToken;
   if (accessToken) {
     config.headers.set('Authorization', `Bearer ${accessToken}`);
   }
@@ -73,26 +93,33 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const status = error.response?.status;
     const original = error.config as
-      | (InternalAxiosRequestConfig & { _retry?: boolean })
-      | undefined;
+      (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
     const url = original?.url ?? '';
-    const isAuthRoute =
-      url.includes('/auth/mobile/refresh') ||
-      url.includes('/auth/mobile/google') ||
-      url.includes('/auth/mobile/logout');
-
-    if (status === 401 && original && !original._retry && !isAuthRoute) {
+    if (
+      status === 401 &&
+      original &&
+      !original._retry &&
+      !isAuthRoute(url) &&
+      !isCodeRejection(error.response?.data)
+    ) {
       original._retry = true;
       try {
         const accessToken = await refreshAccessToken();
         original.headers.set('Authorization', `Bearer ${accessToken}`);
         return api(original);
-      } catch {
-        await clearTokens();
-        await unauthorizedHandler?.();
-        return Promise.reject(
-          new ApiError('Your session has expired. Please sign in again.', 401, 'UNAUTHORIZED'),
-        );
+      } catch (refreshError) {
+        if (isInvalidSessionError(refreshError)) {
+          await clearTokens();
+          await unauthorizedHandler?.();
+          return Promise.reject(
+            new ApiError(
+              'Your session has expired. Please sign in again.',
+              401,
+              'UNAUTHORIZED',
+            ),
+          );
+        }
+        return Promise.reject(toApiError(refreshError));
       }
     }
 

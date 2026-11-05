@@ -3,12 +3,20 @@ import { ChevronRight, ImageOff } from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 
 import { AppText } from '@/components/ui/text';
-import { formatDateTime } from '@/lib/format';
+import { formatRelativeTime } from '@/lib/format';
 import { mediaViewUrl } from '@/lib/media-url';
+import { mediaImageSource } from '@/lib/media-source';
+import { REPORT_STATUS_LABEL } from '@/lib/reports';
 import { useTheme } from '@/theme';
 import type { Report } from '@/types/domain';
 
-import { CategoryBadge, ReportStatusBadge } from './report-badges';
+import {
+  CategoryLabel,
+  categoryLabel,
+  ReportStatusBadge,
+} from './report-badges';
+
+const THUMB = 72;
 
 export function ReportListItem({
   report,
@@ -19,11 +27,13 @@ export function ReportListItem({
 }) {
   const { colors, radius, spacing } = useTheme();
   const uri = mediaViewUrl(report.media);
+  const when = formatRelativeTime(report.createdAt);
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`Report ${report.id}: ${report.description}`}
+      accessibilityLabel={`${report.description}. ${REPORT_STATUS_LABEL[report.status]}. ${categoryLabel(report.predictedCategory)}. ${when}.`}
+      accessibilityHint="Opens report details"
       onPress={onPress}
       style={({ pressed }) => ({
         flexDirection: 'row',
@@ -38,8 +48,8 @@ export function ReportListItem({
     >
       <View
         style={{
-          width: 64,
-          height: 64,
+          width: THUMB,
+          height: THUMB,
           borderRadius: radius.md,
           overflow: 'hidden',
           backgroundColor: colors.muted,
@@ -49,8 +59,8 @@ export function ReportListItem({
       >
         {uri ? (
           <Image
-            source={{ uri }}
-            style={{ width: 64, height: 64 }}
+            source={mediaImageSource(uri)}
+            style={{ width: THUMB, height: THUMB }}
             contentFit="cover"
             transition={150}
           />
@@ -59,22 +69,33 @@ export function ReportListItem({
         )}
       </View>
 
-      <View style={{ flex: 1, gap: spacing.xs }}>
+      <View style={{ flex: 1, gap: spacing.sm }}>
         <View
           style={{
             flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            alignItems: 'flex-start',
             gap: spacing.sm,
           }}
         >
-          <AppText variant="caption" color={colors.mutedForeground}>
-            #{report.id} · {formatDateTime(report.createdAt)}
+          <AppText weight="medium" numberOfLines={2} style={{ flex: 1 }}>
+            {report.description}
           </AppText>
           <ReportStatusBadge status={report.status} />
         </View>
-        <AppText numberOfLines={2}>{report.description}</AppText>
-        <CategoryBadge category={report.predictedCategory} />
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            columnGap: spacing.sm,
+            rowGap: 2,
+          }}
+        >
+          <CategoryLabel category={report.predictedCategory} />
+          <AppText variant="caption" color={colors.mutedForeground}>
+            · {when} · #{report.id}
+          </AppText>
+        </View>
       </View>
 
       <ChevronRight size={18} color={colors.mutedForeground} />

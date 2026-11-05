@@ -48,7 +48,9 @@ async function compress(
   );
 }
 
-export async function prepareReportImage(asset: ImagePickerAsset): Promise<UploadFile> {
+export async function prepareReportImage(
+  asset: ImagePickerAsset,
+): Promise<UploadFile> {
   const type = inferType(asset);
   if (!type || !(ALLOWED_IMAGE_TYPES as readonly string[]).includes(type)) {
     throw new Error('Photo must be JPEG, PNG, or WebP');
@@ -71,5 +73,7 @@ export async function prepareReportImage(asset: ImagePickerAsset): Promise<Uploa
     }
   }
 
-  throw new Error('Could not compress the photo below 5 MB. Choose another image.');
+  throw new Error(
+    'Could not compress the photo below 5 MB. Choose another image.',
+  );
 }

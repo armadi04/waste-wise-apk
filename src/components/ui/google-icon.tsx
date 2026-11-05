@@ -1,4 +1,4 @@
-import Svg, { Path } from "react-native-svg";
+import Svg, { Path } from 'react-native-svg';
 
 export function GoogleIcon({ size = 20 }: { size?: number }) {
   return (

@@ -4,6 +4,7 @@ import type {
   Report,
   ReportListParams,
   ReportStatus,
+  UpdateReportPayload,
 } from '@/types/domain';
 
 export async function listReports(
@@ -16,6 +17,10 @@ export async function listReports(
       sort: 'createdAt',
       direction: 'DESC',
       ...(params.status ? { status: params.status } : {}),
+      ...(params.search ? { search: params.search } : {}),
+      ...(params.category ? { category: params.category } : {}),
+      ...(params.from ? { from: params.from } : {}),
+      ...(params.to ? { to: params.to } : {}),
     },
   });
   return data;
@@ -38,7 +43,21 @@ export async function createReport(input: CreateReportInput): Promise<Report> {
   return data;
 }
 
-export async function getReportStats(): Promise<import('@/types/domain').ReportStats> {
+export async function updateReport(
+  id: number,
+  payload: UpdateReportPayload,
+): Promise<Report> {
+  const { data } = await api.patch<Report>(`/reports/${id}`, payload);
+  return data;
+}
+
+export async function deleteReport(id: number): Promise<void> {
+  await api.delete(`/reports/${id}`);
+}
+
+export async function getReportStats(): Promise<
+  import('@/types/domain').ReportStats
+> {
   const { data } = await api.get('/stats/reports');
   return data;
 }

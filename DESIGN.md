@@ -29,45 +29,45 @@ only. Every token must exist in both themes; never inherit a missing dark value 
 
 ### Surfaces, actions and inputs
 
-| Application token | Light | Dark |
-|---|---|---|
-| `background` | #FFFFFF | #000000 |
-| `surface` | #FFFFFF | #18181B |
-| `surface-hover` | #E4E4E7 | #3F3F46 |
-| `surface-pressed` | #D4D4D8 | #52525B |
-| `foreground` | #11181C | #ECEDEE |
-| `muted` | #F4F4F5 | #27272A |
-| `muted-foreground` | #52525B | #D4D4D8 |
-| `border-subtle` | #E4E4E7 | #3F3F46 |
-| `border-control` | #71717A | #A1A1AA |
-| `primary` | #0F766E | #0F766E |
-| `primary-hover` | #115E59 | #115E59 |
-| `primary-pressed` | #134E4A | #134E4A |
-| `primary-foreground` | #FFFFFF | #FFFFFF |
-| `link` | #0F766E | #5EEAD4 |
-| `link-hover` | #115E59 | #99F6E4 |
-| `selected-background` | #F0FDFA | #134E4A |
-| `selected-hover` | #CCFBF1 | #115E59 |
-| `selected-foreground` | #0F766E | #99F6E4 |
-| `selected-border` | #0D9488 | #2DD4BF |
-| `brand` | #0B4F5C | #0B4F5C |
-| `brand-pressed` | #083F49 | #083F49 |
-| `brand-foreground` | #FFFFFF | #FFFFFF |
+| Application token        | Light   | Dark    |
+| ------------------------ | ------- | ------- |
+| `background`             | #FFFFFF | #000000 |
+| `surface`                | #FFFFFF | #18181B |
+| `surface-hover`          | #E4E4E7 | #3F3F46 |
+| `surface-pressed`        | #D4D4D8 | #52525B |
+| `foreground`             | #11181C | #ECEDEE |
+| `muted`                  | #F4F4F5 | #27272A |
+| `muted-foreground`       | #52525B | #D4D4D8 |
+| `border-subtle`          | #E4E4E7 | #3F3F46 |
+| `border-control`         | #71717A | #A1A1AA |
+| `primary`                | #0F766E | #0F766E |
+| `primary-hover`          | #115E59 | #115E59 |
+| `primary-pressed`        | #134E4A | #134E4A |
+| `primary-foreground`     | #FFFFFF | #FFFFFF |
+| `link`                   | #0F766E | #5EEAD4 |
+| `link-hover`             | #115E59 | #99F6E4 |
+| `selected-background`    | #F0FDFA | #134E4A |
+| `selected-hover`         | #CCFBF1 | #115E59 |
+| `selected-foreground`    | #0F766E | #99F6E4 |
+| `selected-border`        | #0D9488 | #2DD4BF |
+| `brand`                  | #0B4F5C | #0B4F5C |
+| `brand-pressed`          | #083F49 | #083F49 |
+| `brand-foreground`       | #FFFFFF | #FFFFFF |
 | `brand-muted-foreground` | #D3DFE2 | #D3DFE2 |
-| `shadow` | #000000 | #000000 |
-| `focus` | #0D9488 | #5EEAD4 |
-| `focus-offset` | #FFFFFF | #18181B |
-| `disabled-background` | #F4F4F5 | #27272A |
-| `disabled-foreground` | #71717A | #A1A1AA |
-| `disabled-border` | #D4D4D8 | #52525B |
-| `input-background` | #FFFFFF | #18181B |
-| `input-foreground` | #11181C | #ECEDEE |
-| `input-placeholder` | #71717A | #A1A1AA |
-| `input-border` | #71717A | #A1A1AA |
-| `input-border-hover` | #3F3F46 | #D4D4D8 |
-| `input-border-focus` | #0D9488 | #5EEAD4 |
-| `input-border-error` | #B91C1C | #F87171 |
-| `accent` | #F3AA28 | #F3AA28 |
+| `shadow`                 | #000000 | #000000 |
+| `focus`                  | #0D9488 | #5EEAD4 |
+| `focus-offset`           | #FFFFFF | #18181B |
+| `disabled-background`    | #F4F4F5 | #27272A |
+| `disabled-foreground`    | #71717A | #A1A1AA |
+| `disabled-border`        | #D4D4D8 | #52525B |
+| `input-background`       | #FFFFFF | #18181B |
+| `input-foreground`       | #11181C | #ECEDEE |
+| `input-placeholder`      | #71717A | #A1A1AA |
+| `input-border`           | #71717A | #A1A1AA |
+| `input-border-hover`     | #3F3F46 | #D4D4D8 |
+| `input-border-focus`     | #0D9488 | #5EEAD4 |
+| `input-border-error`     | #B91C1C | #F87171 |
+| `accent`                 | #F3AA28 | #F3AA28 |
 
 `surface` is the background for cards, sheets, forms and navigation. `border-subtle` is
 only a decorative separator; interactive controls use `border-control` or `input-border`.
@@ -108,51 +108,82 @@ contrast. A bright dark-mode status text color must never become a solid button 
 with white text. Keep status meaning consistent and include a label or icon; never
 communicate status through color alone.
 
-| Application token | Light | Dark |
-|---|---|---|
-| `success` | #15803D | #4ADE80 |
-| `success-background` | #F0FDF4 | #14532D |
-| `success-foreground` | #166534 | #DCFCE7 |
-| `success-border` | #15803D | #4ADE80 |
-| `success-solid` | #15803D | #15803D |
-| `success-solid-hover` | #166534 | #166534 |
-| `success-solid-pressed` | #14532D | #14532D |
+| Application token          | Light   | Dark    |
+| -------------------------- | ------- | ------- |
+| `success`                  | #15803D | #4ADE80 |
+| `success-background`       | #F0FDF4 | #14532D |
+| `success-foreground`       | #166534 | #DCFCE7 |
+| `success-border`           | #15803D | #4ADE80 |
+| `success-solid`            | #15803D | #15803D |
+| `success-solid-hover`      | #166534 | #166534 |
+| `success-solid-pressed`    | #14532D | #14532D |
 | `success-solid-foreground` | #FFFFFF | #FFFFFF |
-| `warning` | #B45309 | #FBBF24 |
-| `warning-background` | #FFFBEB | #451A03 |
-| `warning-foreground` | #92400E | #FDE68A |
-| `warning-border` | #B45309 | #FBBF24 |
-| `warning-solid` | #B45309 | #B45309 |
-| `warning-solid-hover` | #92400E | #92400E |
-| `warning-solid-pressed` | #78350F | #78350F |
+| `warning`                  | #B45309 | #FBBF24 |
+| `warning-background`       | #FFFBEB | #451A03 |
+| `warning-foreground`       | #92400E | #FDE68A |
+| `warning-border`           | #B45309 | #FBBF24 |
+| `warning-solid`            | #B45309 | #B45309 |
+| `warning-solid-hover`      | #92400E | #92400E |
+| `warning-solid-pressed`    | #78350F | #78350F |
 | `warning-solid-foreground` | #FFFFFF | #FFFFFF |
-| `danger` | #B91C1C | #FCA5A5 |
-| `danger-background` | #FEF2F2 | #450A0A |
-| `danger-foreground` | #991B1B | #FECACA |
-| `danger-border` | #B91C1C | #F87171 |
-| `danger-solid` | #B91C1C | #B91C1C |
-| `danger-solid-hover` | #991B1B | #991B1B |
-| `danger-solid-pressed` | #7F1D1D | #7F1D1D |
-| `danger-solid-foreground` | #FFFFFF | #FFFFFF |
-| `info` | #0F766E | #5EEAD4 |
-| `info-background` | #F0FDFA | #134E4A |
-| `info-foreground` | #0F766E | #99F6E4 |
-| `info-border` | #0D9488 | #2DD4BF |
-| `info-solid` | #0F766E | #0F766E |
-| `info-solid-hover` | #115E59 | #115E59 |
-| `info-solid-pressed` | #134E4A | #134E4A |
-| `info-solid-foreground` | #FFFFFF | #FFFFFF |
+| `danger`                   | #B91C1C | #FCA5A5 |
+| `danger-background`        | #FEF2F2 | #450A0A |
+| `danger-foreground`        | #991B1B | #FECACA |
+| `danger-border`            | #B91C1C | #F87171 |
+| `danger-solid`             | #B91C1C | #B91C1C |
+| `danger-solid-hover`       | #991B1B | #991B1B |
+| `danger-solid-pressed`     | #7F1D1D | #7F1D1D |
+| `danger-solid-foreground`  | #FFFFFF | #FFFFFF |
+| `info`                     | #0F766E | #5EEAD4 |
+| `info-background`          | #F0FDFA | #134E4A |
+| `info-foreground`          | #0F766E | #99F6E4 |
+| `info-border`              | #0D9488 | #2DD4BF |
+| `info-solid`               | #0F766E | #0F766E |
+| `info-solid-hover`         | #115E59 | #115E59 |
+| `info-solid-pressed`       | #134E4A | #134E4A |
+| `info-solid-foreground`    | #FFFFFF | #FFFFFF |
+
+### Report status and waste category
+
+Report status uses a soft pill with a leading dot plus its label. Category is never a pill:
+it renders as a category icon plus colored text, so the two can never be confused.
+
+| Status      | Tone       |
+| ----------- | ---------- |
+| Pending     | `warning`  |
+| In Progress | `progress` |
+| Completed   | `success`  |
+| Rejected    | `danger`   |
+
+`info` teal is reserved for alerts and brand moments; it collides with `primary` and the
+selected state, so do not use it for report status or category.
+
+| Application token               | Light   | Dark    |
+| ------------------------------- | ------- | ------- |
+| `progress`                      | #1D4ED8 | #60A5FA |
+| `progress-background`           | #EFF6FF | #172554 |
+| `progress-foreground`           | #1E40AF | #BFDBFE |
+| `progress-border`               | #3B82F6 | #60A5FA |
+| `category-organic` (Leaf)       | #15803D | #4ADE80 |
+| `category-plastic` (CupSoda)    | #A16207 | #FACC15 |
+| `category-paper` (Newspaper)    | #1D4ED8 | #93C5FD |
+| `category-unknown` (CircleHelp) | #52525B | #D4D4D8 |
+
+Category hues follow the Indonesian bin convention (organik hijau, anorganik kuning, kertas
+biru). `__tests__/unit/theme-tokens.test.ts` enforces token parity and 4.5:1 contrast.
 
 ### Component mapping
 
-| Mobile primitive | Color and state rule |
-|---|---|
-| `AppText` | `typography` role + `fontFamily`; defaults to `foreground` |
-| `Screen` | `background`, safe areas, optional scroll and refresh control |
-| `Card` | `surface`, `border-subtle` and `radius.lg` |
-| `Button` | Primary uses `primary` + `primary-foreground`; danger uses `danger-solid` + `danger-solid-foreground`; disabled uses disabled tokens |
-| `TextField` | Input tokens, focus ring, disabled tokens and inline error text |
-| `Segmented` | `selected-*` tokens plus weight and accessible selected state |
+| Mobile primitive        | Color and state rule                                                                                                                 |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `AppText`               | `typography` role + `fontFamily`; defaults to `foreground`                                                                           |
+| `Screen`                | `background`, safe areas, optional scroll and refresh control                                                                        |
+| `Card`                  | `surface`, `border-subtle` and `radius.lg`                                                                                           |
+| `Button`                | Primary uses `primary` + `primary-foreground`; danger uses `danger-solid` + `danger-solid-foreground`; disabled uses disabled tokens |
+| `TextField`             | Input tokens, focus ring, disabled tokens and inline error text                                                                      |
+| `Button` inverse        | `brandForeground` background + `brand` label; only on `brand` surfaces                                                               |
+| `Button` danger-outline | `danger` label and `dangerBorder`; pressed `dangerBackground`; for destructive actions that must not dominate                        |
+| `Segmented`             | `selected-*` tokens plus weight and accessible selected state                                                                        |
 
 Do not rely on opacity or inherited colors to approximate a token state. Use the explicit
 hover, pressed, selected, invalid and disabled tokens in the shared components.
@@ -175,15 +206,15 @@ hover, pressed, selected, invalid and disabled tokens in the shared components.
 Use **Plus Jakarta Sans** throughout the UI with a system sans-serif fallback. Use weights
 400, 500 and 600; avoid thin weights for operational data.
 
-| Element | Size | Weight |
-|---|---|---|
-| Display / auth hero | 30–32 px | 600 |
-| Page title | 24–28 px | 600 |
-| Section title | 18–20 px | 600 |
-| Card title | 16 px | 600 |
-| Body and form inputs | 14–16 px | 400 |
+| Element                        | Size     | Weight  |
+| ------------------------------ | -------- | ------- |
+| Display / auth hero            | 30–32 px | 600     |
+| Page title                     | 24–28 px | 600     |
+| Section title                  | 18–20 px | 600     |
+| Card title                     | 16 px    | 600     |
+| Body and form inputs           | 14–16 px | 400     |
 | Navigation, labels and buttons | 14–15 px | 500–600 |
-| Metadata and captions | 12–13 px | 400 |
+| Metadata and captions          | 12–13 px | 400     |
 
 Use a body line-height of 1.5 and a heading line-height of 1.25–1.3. Keep labels readable and
 hierarchy clear. Use tabular figures for amounts, quantities and dates where the platform
@@ -197,7 +228,69 @@ supports them. Long list rows use truncation plus accessible full content where 
 - Use `Screen` for safe areas, padding, scrolling and refresh behavior.
 - Forms own values through React Hook Form and Zod; modal stores own open and selection state
   only.
-- Use native modals and sheets with labeled controls and accessible dismissal.
+- Choices that need more room than a dialog (report filters, time zone, 2FA code entry)
+  use `BottomSheet` (`src/components/ui/bottom-sheet.tsx`): `scrim`, `surface` panel with
+  `radius.xl` top corners, a drag handle, a header title and an optional footer of actions.
+  Mount sheets only while open so their draft state resets.
+- Profile is a hub: identity card with "Edit profile", then `ListGroup`/`ListRow` groups
+  (Account: Security, Sessions; App: Notifications). Rows are at least 60 dp,
+  show a short trailing value (On/Off, counts, version) and a chevron.
+- Home shows a bell with an unread badge (`dangerSolid`, capped at 99+) next to the avatar.
+  Notification rows show a type icon, bold title and dot while unread; tapping marks them
+  read and opens linked reports.
+- Report History filters: status chips inline, category and date presets in the filter
+  sheet, active extras as removable chips. The filter button shows the active count.
+- Report actions (Edit, Delete) appear only for the owner while the report is Pending.
+  Delete always goes through a danger `Dialog`.
+- 2FA setup shows recovery codes once, selectable for copying, and requires an explicit
+  "I've saved these codes" acknowledgement. Disabling 2FA or replacing codes always asks
+  for a code first.
+- Confirmations and permission prompts use the themed `Dialog` (`src/components/ui/dialog.tsx`),
+  never `Alert.alert`, which ignores the theme and fonts. Dialogs sit on the `scrim` token,
+  use `surface` + `radius.xl`, a tone-tinted icon, a full-width confirm button (`danger` for
+  destructive actions) and a ghost Cancel. Back button, scrim tap and Cancel all dismiss,
+  except while the confirm action is loading.
+- Auth uses one screen and one Google CTA. New accounts are created automatically, so do not
+  add a separate register form or a login/register toggle. Show loading text on the CTA and
+  announce errors through a live region.
+- Auth layout uses a branded hero above a compact bottom dock. Keep the dock content-sized
+  instead of stretching it to fill the screen; the hero absorbs remaining height. Use
+  `surface` for the dock so dark mode does not render a pure black plane. Anchor the CTA at the
+  bottom of the dock for thumb reach.
+- The login hero shows `AuthIllustration` (decorative SVG, hidden from accessibility) in the
+  space between the brand row and the headline; it flexes between 120 and 280 dp so the dock
+  never scrolls off-screen. Other auth screens (two-factor) omit it. The hero is always a dark
+  brand surface, so the illustration uses the dark-theme category hues in both modes.
+- The login dock holds only the Google button, one reassurance caption and errors. Do not
+  repeat the hero message as a dock title.
+- The Google button follows Google's sign-in branding: `google-button-*` tokens (light
+  #FFFFFF / #747775 border / #1F1F1F text, dark #131314 / #8E918F border / #E3E3E3 text),
+  the full-colour G with no badge, pill shape and 56 dp height. Never tint it with `primary`.
+- "New report" is a global action: the circular `+` beside the floating tab bar. Home keeps
+  the hero "Report waste" button as its contextual CTA. Do not add FABs, header buttons or
+  empty-state buttons that duplicate it.
+- The Home hero uses the `brand` surface with `BrandBackdrop` and an `inverse` button.
+  Status rows deep-link to My Reports with a `status` param.
+- The tab bar is a floating capsule (`FloatingTabBar`): `surface` + `borderSubtle` +
+  `shadow`, `radius.pill`, 64 dp tall, offset above the bottom safe-area inset. The active
+  tab is a filled `selected-background` pill with `selected-foreground` icon and semibold
+  label, so it is not color-only. It hides while the keyboard is open.
+- Content scrolls behind the floating bar. `Screen` reserves the space automatically
+  through `TabBarInsetContext`; custom lists inside tabs pad their bottom with
+  `useTabBarInset()`.
+- Report lists group items by local day (Today, Yesterday, date), show relative times on
+  rows, debounce search by 300 ms and end with an "all caught up" marker. Filter chips
+  show counts only when greater than zero.
+- Long forms (Create Report) put the submit action in the `Screen` `footer` slot. The footer
+  shows requirement chips (icon + label, not color only) and names the first missing item
+  under a disabled button; while submitting, the button label carries the stage.
+- Create Report requests GPS on entry because location is mandatory. Show loading, captured
+  and error states inline, with "Try again" and "Settings" as the recovery path.
+- When a stored session cannot be restored because of a transient failure, keep the tokens and
+  show a retry screen; clear tokens only for an invalid or expired session.
+- Two-factor verification is a second auth step. Keep the challenge token in memory only, show a
+  single code field that accepts TOTP or recovery codes, and offer a clear start-over action.
+  Never place the challenge token in a URL or persistent storage.
 - Confirm destructive actions, retain drafts on API failure and surface actionable errors.
 - Permission gates apply to navigation and actions; never imply a UI gate authorizes API
   access.

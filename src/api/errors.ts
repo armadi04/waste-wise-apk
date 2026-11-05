@@ -4,7 +4,11 @@ export class ApiError extends Error {
   readonly status: number | null;
   readonly code: string | null;
 
-  constructor(message: string, status: number | null = null, code: string | null = null) {
+  constructor(
+    message: string,
+    status: number | null = null,
+    code: string | null = null,
+  ) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
@@ -31,8 +35,7 @@ export function toApiError(error: unknown): ApiError {
   if (isAxiosError(error)) {
     const status = error.response?.status ?? null;
     const body = error.response?.data as
-      | { message?: unknown; code?: unknown }
-      | undefined;
+      { message?: unknown; code?: unknown } | undefined;
     const fallback =
       status === 401
         ? 'Your session has expired. Please sign in again.'

@@ -1,6 +1,6 @@
 import { View, type ViewStyle } from 'react-native';
 
-import type { Tone } from '@/lib/reports';
+import { toneColors, type Tone } from '@/lib/reports';
 import { useTheme } from '@/theme';
 
 import { AppText } from './text';
@@ -8,39 +8,14 @@ import { AppText } from './text';
 interface BadgeProps {
   label: string;
   tone?: Tone;
+  /** Leading dot in the tone's solid color; pairs with the label. */
+  dot?: boolean;
   style?: ViewStyle;
 }
 
-export function Badge({ label, tone = 'default', style }: BadgeProps) {
+export function Badge({ label, tone = 'default', dot, style }: BadgeProps) {
   const { colors, radius, spacing } = useTheme();
-  const toneStyle: Record<Tone, { bg: string; fg: string; border: string }> = {
-    default: {
-      bg: colors.muted,
-      fg: colors.mutedForeground,
-      border: colors.borderSubtle,
-    },
-    info: {
-      bg: colors.infoBackground,
-      fg: colors.infoForeground,
-      border: colors.infoBorder,
-    },
-    success: {
-      bg: colors.successBackground,
-      fg: colors.successForeground,
-      border: colors.successBorder,
-    },
-    warning: {
-      bg: colors.warningBackground,
-      fg: colors.warningForeground,
-      border: colors.warningBorder,
-    },
-    danger: {
-      bg: colors.dangerBackground,
-      fg: colors.dangerForeground,
-      border: colors.dangerBorder,
-    },
-  };
-  const current = toneStyle[tone];
+  const current = toneColors(colors, tone);
   return (
     <View
       style={[
@@ -48,17 +23,25 @@ export function Badge({ label, tone = 'default', style }: BadgeProps) {
           alignSelf: 'flex-start',
           flexDirection: 'row',
           alignItems: 'center',
-          gap: spacing.xs,
+          gap: spacing.xs + 2,
           borderRadius: radius.pill,
-          borderWidth: 1,
-          borderColor: current.border,
           backgroundColor: current.bg,
-          paddingHorizontal: spacing.md,
-          paddingVertical: spacing.xs,
+          paddingHorizontal: spacing.sm + 2,
+          paddingVertical: 3,
         },
         style,
       ]}
     >
+      {dot ? (
+        <View
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: 3,
+            backgroundColor: current.solid,
+          }}
+        />
+      ) : null}
       <AppText variant="caption" color={current.fg} weight="semibold">
         {label}
       </AppText>

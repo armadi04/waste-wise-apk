@@ -41,3 +41,6 @@ bun-error.*
 
 # local environment
 .env
+
+# Agent
+.claude/

@@ -1,24 +1,21 @@
 import { useRouter } from 'expo-router';
-import {
-  CheckCircle2,
-  Clock3,
-  FileWarning,
-  Plus,
-  RotateCw,
-  XCircle,
-} from 'lucide-react-native';
-import { RefreshControl, View } from 'react-native';
+import { Bell } from 'lucide-react-native';
+import { Pressable, RefreshControl, View } from 'react-native';
 
+import { errorMessage } from '@/api/errors';
 import { useAuth } from '@/auth/auth-provider';
-import { StatCard } from '@/components/dashboard/stat-card';
+import { DashboardHero } from '@/components/dashboard/dashboard-hero';
+import { CategoryBreakdown } from '@/components/dashboard/category-breakdown';
+import { StatusBreakdown } from '@/components/dashboard/status-breakdown';
 import { ReportListItem } from '@/components/reports/report-list-item';
+import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Screen, ScreenHeader, SectionHeader } from '@/components/ui/layout';
+import { Screen, SectionHeader } from '@/components/ui/layout';
 import { EmptyState, ErrorState, Skeleton } from '@/components/ui/states';
 import { AppText } from '@/components/ui/text';
+import { useUnreadNotificationCount } from '@/hooks/use-notifications';
 import { useReportStats } from '@/hooks/use-reports';
-import { errorMessage } from '@/api/errors';
+import { greeting } from '@/lib/format';
 import { useTheme } from '@/theme';
 
 export default function DashboardScreen() {
@@ -26,11 +23,14 @@ export default function DashboardScreen() {
   const { user } = useAuth();
   const router = useRouter();
   const stats = useReportStats();
+  const unread = useUnreadNotificationCount().data ?? 0;
+  const unreadLabel = unread > 99 ? '99+' : String(unread);
 
   const openReport = (id: number) =>
     router.push({ pathname: '/reports/[id]', params: { id: String(id) } });
 
   const firstName = user?.fullname?.split(' ')[0] || 'there';
+  const recent = stats.data?.recentReports.slice(0, 3) ?? [];
 
   return (
     <Screen
@@ -44,100 +44,135 @@ export default function DashboardScreen() {
         />
       }
     >
-      <ScreenHeader
-        title={`Hello, ${firstName}`}
-        subtitle="Here is what is happening with your waste reports."
-        right={
-          <Button
-            label="New"
-            icon={<Plus size={17} color={colors.primaryForeground} />}
-            onPress={() => router.push('/reports/create')}
-          />
-        }
-      />
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: spacing.md,
+        }}
+      >
+        <View style={{ flex: 1 }}>
+          <AppText color={colors.mutedForeground}>{greeting()},</AppText>
+          <AppText variant="pageTitle" numberOfLines={1}>
+            {firstName}
+          </AppText>
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={
+            unread ? `Notifications, ${unreadLabel} unread` : 'Notifications'
+          }
+          onPress={() => router.push('/notifications')}
+          style={({ pressed }) => ({
+            width: 44,
+            height: 44,
+            borderRadius: 22,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderWidth: 1,
+            borderColor: colors.borderSubtle,
+            backgroundColor: pressed ? colors.surfaceHover : colors.surface,
+          })}
+        >
+          <Bell size={20} color={colors.foreground} />
+          {unread ? (
+            <View
+              style={{
+                position: 'absolute',
+                top: -4,
+                right: -4,
+                minWidth: 20,
+                height: 20,
+                paddingHorizontal: 5,
+                borderRadius: 10,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: colors.dangerSolid,
+                borderWidth: 2,
+                borderColor: colors.background,
+              }}
+            >
+              <AppText
+                variant="caption"
+                weight="semibold"
+                color={colors.dangerSolidForeground}
+                style={{ fontSize: 10, lineHeight: 12 }}
+              >
+                {unreadLabel}
+              </AppText>
+            </View>
+          ) : null}
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Open profile"
+          onPress={() => router.push('/profile')}
+          hitSlop={8}
+        >
+          <Avatar media={user?.avatar} name={user?.fullname} size={48} />
+        </Pressable>
+      </View>
 
       {stats.isLoading ? (
         <View style={{ gap: spacing.md }}>
-          <View style={{ flexDirection: 'row', gap: spacing.md }}>
-            <Skeleton height={110} />
-            <Skeleton height={110} />
-          </View>
-          <Skeleton height={110} />
-          <Skeleton height={200} />
+          <Skeleton height={168} />
+          <Skeleton height={220} />
+          <Skeleton height={92} />
+          <Skeleton height={92} />
         </View>
-      ) : stats.isError ? (
+      ) : stats.isError || !stats.data ? (
         <ErrorState
           message={errorMessage(stats.error)}
           onRetry={() => void stats.refetch()}
         />
       ) : (
         <>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md }}>
-            <StatCard
-              label="Total Reports"
-              value={stats.data?.total ?? 0}
-              icon={<FileWarning size={18} color={colors.foreground} />}
-            />
-            <StatCard
-              label="Pending"
-              value={stats.data?.pending ?? 0}
-              tone="warning"
-              icon={<Clock3 size={18} color={colors.warningForeground} />}
-            />
-            <StatCard
-              label="In Progress"
-              value={stats.data?.inProgress ?? 0}
-              tone="info"
-              icon={<RotateCw size={18} color={colors.infoForeground} />}
-            />
-            <StatCard
-              label="Completed"
-              value={stats.data?.completed ?? 0}
-              tone="success"
-              icon={<CheckCircle2 size={18} color={colors.successForeground} />}
-            />
-            <StatCard
-              label="Rejected"
-              value={stats.data?.rejected ?? 0}
-              tone="danger"
-              icon={<XCircle size={18} color={colors.dangerForeground} />}
-            />
-          </View>
-
-          <Card style={{ gap: spacing.md }}>
+          <DashboardHero
+            total={stats.data.total}
+            onReport={() => router.push('/reports/create')}
+          />
+          <StatusBreakdown
+            stats={stats.data}
+            onSelect={(status) =>
+              router.push({ pathname: '/reports', params: { status } })
+            }
+          />
+          <CategoryBreakdown
+            stats={stats.data}
+            onSelect={(category) =>
+              router.push({ pathname: '/reports', params: { category } })
+            }
+          />
+          <View style={{ gap: spacing.sm }}>
             <SectionHeader
-              title="Recent Reports"
+              title="Recent reports"
               action={
-                <Button
-                  label="View all"
-                  variant="ghost"
-                  onPress={() => router.push('/reports')}
-                />
+                recent.length ? (
+                  <Button
+                    label="View all"
+                    variant="ghost"
+                    onPress={() => router.push('/reports')}
+                  />
+                ) : undefined
               }
             />
-            {stats.data?.recentReports.length ? (
-              <View style={{ gap: spacing.sm }}>
-                {stats.data.recentReports.map((report) => (
-                  <ReportListItem
-                    key={report.id}
-                    report={report}
-                    onPress={() => openReport(report.id)}
-                  />
-                ))}
-              </View>
+            {recent.length ? (
+              recent.map((report) => (
+                <ReportListItem
+                  key={report.id}
+                  report={report}
+                  onPress={() => openReport(report.id)}
+                />
+              ))
             ) : (
               <EmptyState
+                variant="plain"
                 title="No reports yet"
-                description="Create your first report and let AI classify the waste."
-                actionLabel="Create report"
-                onAction={() => router.push('/reports/create')}
+                description="Tap Report waste and let AI classify it."
               />
             )}
-          </Card>
-
-          <AppText variant="caption" color={colors.mutedForeground}>
-            Statistics only include reports owned by your account.
-          </AppText>
+          </View>
         </>
       )}
     </Screen>

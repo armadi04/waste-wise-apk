@@ -11,12 +11,13 @@ import { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider, useAuth } from '@/auth/auth-provider';
+import { SessionRecoveryScreen } from '@/auth/session-recovery-screen';
 import { ThemeProvider, useTheme } from '@/theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
 function RootNavigator() {
-  const { status } = useAuth();
+  const { status, retrySessionRestore, signOut } = useAuth();
   const { colors, mode, hydrated } = useTheme();
   const [fontsLoaded, fontError] = useFonts({
     PlusJakartaSans_400Regular,
@@ -24,13 +25,27 @@ function RootNavigator() {
     PlusJakartaSans_600SemiBold,
   });
 
-  const ready = hydrated && (fontsLoaded || !!fontError) && status !== 'loading';
+  const ready =
+    hydrated && (fontsLoaded || !!fontError) && status !== 'loading';
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync().catch(() => undefined);
   }, [ready]);
 
   if (!ready) return null;
+
+  if (status === 'restore-error') {
+    return (
+      <>
+        <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
+        <NavigationBar style={mode === 'dark' ? 'dark' : 'light'} />
+        <SessionRecoveryScreen
+          onRetry={retrySessionRestore}
+          onSignOut={signOut}
+        />
+      </>
+    );
+  }
 
   return (
     <>
@@ -43,12 +58,17 @@ function RootNavigator() {
           animation: 'slide_from_right',
         }}
       >
-        <Stack.Protected guard={status === 'authenticated'}>
+        <Stack.Protected guard={status === 'authenticated'} redirectTo="/login">
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="reports/create" />
-          <Stack.Screen name="reports/[id]" />
+          <Stack.Screen name="reports/[id]/index" />
+          <Stack.Screen name="reports/[id]/edit" />
+          <Stack.Screen name="notifications" />
+          <Stack.Screen name="profile/edit" />
+          <Stack.Screen name="profile/security" />
+          <Stack.Screen name="profile/sessions" />
         </Stack.Protected>
-        <Stack.Protected guard={status !== 'authenticated'} redirectTo="/login">
+        <Stack.Protected guard={status !== 'authenticated'}>
           <Stack.Screen name="(auth)" />
         </Stack.Protected>
       </Stack>

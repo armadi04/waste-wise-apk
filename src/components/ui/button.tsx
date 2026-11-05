@@ -10,12 +10,20 @@ import { useTheme } from '@/theme';
 
 import { AppText } from './text';
 
-type Variant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+type Variant =
+  | 'primary'
+  | 'secondary'
+  | 'outline'
+  | 'ghost'
+  | 'danger'
+  | 'danger-outline'
+  | 'inverse';
 
 interface ButtonProps extends Omit<PressableProps, 'children' | 'style'> {
   label: string;
   variant?: Variant;
   loading?: boolean;
+  loadingLabel?: string;
   icon?: React.ReactNode;
   fullWidth?: boolean;
   style?: ViewStyle;
@@ -25,10 +33,12 @@ export function Button({
   label,
   variant = 'primary',
   loading = false,
+  loadingLabel,
   disabled,
   icon,
   fullWidth,
   style,
+  accessibilityLabel,
   ...rest
 }: ButtonProps) {
   const { colors, radius, spacing, fontFamily } = useTheme();
@@ -40,29 +50,40 @@ export function Button({
       ? colors.primary
       : variant === 'danger'
         ? colors.dangerSolid
-        : variant === 'secondary'
-          ? colors.selectedBackground
-          : 'transparent';
+        : variant === 'inverse'
+          ? colors.brandForeground
+          : variant === 'secondary'
+            ? colors.selectedBackground
+            : 'transparent';
 
   const foreground = isDisabled
     ? colors.disabledForeground
     : variant === 'danger'
       ? colors.dangerSolidForeground
-      : variant === 'primary'
-        ? colors.primaryForeground
-        : variant === 'secondary'
-          ? colors.selectedForeground
-          : colors.foreground;
+      : variant === 'inverse'
+        ? colors.brand
+        : variant === 'danger-outline'
+          ? colors.danger
+          : variant === 'primary'
+            ? colors.primaryForeground
+            : variant === 'secondary'
+              ? colors.selectedForeground
+              : colors.foreground;
 
   const borderColor = isDisabled
     ? colors.disabledBorder
     : variant === 'outline'
       ? colors.borderControl
-      : 'transparent';
+      : variant === 'danger-outline'
+        ? colors.dangerBorder
+        : 'transparent';
 
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={
+        accessibilityLabel ?? (loading ? (loadingLabel ?? label) : label)
+      }
       accessibilityState={{ disabled: isDisabled, busy: loading }}
       disabled={isDisabled}
       {...rest}
@@ -75,17 +96,23 @@ export function Button({
           justifyContent: 'center',
           flexDirection: 'row',
           gap: spacing.sm,
-          borderWidth: variant === 'outline' ? 1 : 0,
+          borderWidth:
+            variant === 'outline' || variant === 'danger-outline' ? 1 : 0,
           borderColor,
-          backgroundColor: pressed && !isDisabled
-            ? variant === 'primary'
-              ? colors.primaryPressed
-              : variant === 'danger'
-                ? colors.dangerBorder
-                : variant === 'secondary'
-                  ? colors.selectedHover
-                  : colors.surfaceHover
-            : background,
+          backgroundColor:
+            pressed && !isDisabled
+              ? variant === 'primary'
+                ? colors.primaryPressed
+                : variant === 'danger'
+                  ? colors.dangerBorder
+                  : variant === 'inverse'
+                    ? colors.brandMutedForeground
+                    : variant === 'danger-outline'
+                      ? colors.dangerBackground
+                      : variant === 'secondary'
+                        ? colors.selectedHover
+                        : colors.surfaceHover
+              : background,
           opacity: fullWidth ? 1 : undefined,
           alignSelf: fullWidth ? 'stretch' : 'flex-start',
         },
@@ -93,9 +120,32 @@ export function Button({
       ]}
     >
       {loading ? (
-        <ActivityIndicator size="small" color={foreground} />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: spacing.sm,
+          }}
+        >
+          <ActivityIndicator size="small" color={foreground} />
+          {loadingLabel ? (
+            <AppText
+              variant="button"
+              color={foreground}
+              style={{ fontFamily: fontFamily.semibold }}
+            >
+              {loadingLabel}
+            </AppText>
+          ) : null}
+        </View>
       ) : (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: spacing.sm,
+          }}
+        >
           {icon}
           <AppText
             variant="button"

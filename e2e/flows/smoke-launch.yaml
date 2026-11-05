@@ -1,0 +1,20 @@
+appId: com.bilcode.wastewise
+name: Smoke - cold launch reaches the sign-in screen or the signed-in home
+tags:
+  - smoke
+---
+# Never clears app data, so it is safe on a device with a real session.
+# Add a separate flow with `clearState` for emulators if a signed-out run is needed.
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible:
+      id: google-sign-in-button
+    timeout: 15000
+    optional: true
+- runFlow:
+    when:
+      notVisible:
+        id: google-sign-in-button
+    commands:
+      - assertVisible: Home

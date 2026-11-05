@@ -1,14 +1,23 @@
 import { ArrowLeft } from 'lucide-react-native';
-import type { ReactNode } from 'react';
+import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import {
+  Keyboard,
+  KeyboardAvoidingView,
   Pressable,
   ScrollView,
+  TextInput,
   View,
   type RefreshControlProps,
+  type ScrollViewInstance,
   type ViewStyle,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
+import { useTabBarInset } from '@/components/navigation/tab-bar-inset';
+import { useKeyboardVisible } from '@/hooks/use-keyboard-visible';
 import { useTheme } from '@/theme';
 
 import { AppText } from './text';
@@ -19,6 +28,8 @@ interface ScreenProps {
   refreshControl?: React.ReactElement<RefreshControlProps>;
   contentContainerStyle?: ViewStyle;
   style?: ViewStyle;
+  /** Sticky bottom bar, rendered below the content with the bottom inset. */
+  footer?: ReactNode;
 }
 
 export function Screen({
@@ -27,12 +38,61 @@ export function Screen({
   refreshControl,
   contentContainerStyle,
   style,
+  footer,
 }: ScreenProps) {
   const { colors, spacing } = useTheme();
+  const insets = useSafeAreaInsets();
+  const tabBarInset = useTabBarInset();
+  const keyboardVisible = useKeyboardVisible();
+  const scrollRef = useRef<ScrollViewInstance>(null);
+  const scrollY = useRef(0);
+
+  // Keep the focused input (e.g. a growing multiline description) visible
+  // above the keyboard instead of leaving it hidden underneath.
+  const revealFocusedInput = useCallback(() => {
+    const view = scrollRef.current;
+    const input = TextInput.State.currentlyFocusedInput();
+    if (!view || !input) return;
+    view.measureInWindow((_vx, viewY, _vw, viewHeight) => {
+      input.measureInWindow((_ix, inputY, _iw, inputHeight) => {
+        const overflow =
+          inputY + inputHeight + spacing.lg - (viewY + viewHeight);
+        if (overflow > 0) {
+          view.scrollTo({ y: scrollY.current + overflow, animated: true });
+        }
+      });
+    });
+  }, [spacing.lg]);
+
+  useEffect(() => {
+    if (!scroll) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const show = Keyboard.addListener('keyboardDidShow', () => {
+      // Wait for KeyboardAvoidingView to shrink the scroll view first.
+      timer = setTimeout(revealFocusedInput, 120);
+    });
+    return () => {
+      show.remove();
+      if (timer) clearTimeout(timer);
+    };
+  }, [scroll, revealFocusedInput]);
+
   const content = scroll ? (
     <ScrollView
+      ref={scrollRef}
+      onScroll={(event) => {
+        scrollY.current = event.nativeEvent.contentOffset.y;
+      }}
+      scrollEventThrottle={16}
+      onContentSizeChange={() => {
+        if (keyboardVisible) revealFocusedInput();
+      }}
       contentContainerStyle={[
-        { padding: spacing.lg, gap: spacing.lg, paddingBottom: spacing.huge },
+        {
+          padding: spacing.lg,
+          gap: spacing.lg,
+          paddingBottom: footer ? spacing.xxl : tabBarInset || spacing.huge,
+        },
         contentContainerStyle,
       ]}
       keyboardShouldPersistTaps="handled"
@@ -57,7 +117,26 @@ export function Screen({
       edges={['top', 'left', 'right']}
       style={[{ flex: 1, backgroundColor: colors.background }, style]}
     >
-      {content}
+      {/* Edge-to-edge Android no longer resizes the window for the IME. */}
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+        {content}
+        {/* Hide the sticky footer while typing so the field stays readable. */}
+        {footer && !keyboardVisible ? (
+          <View
+            style={{
+              borderTopWidth: 1,
+              borderTopColor: colors.borderSubtle,
+              backgroundColor: colors.surface,
+              paddingHorizontal: spacing.lg,
+              paddingTop: spacing.md,
+              paddingBottom: spacing.md + insets.bottom,
+              gap: spacing.sm,
+            }}
+          >
+            {footer}
+          </View>
+        ) : null}
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

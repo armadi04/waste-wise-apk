@@ -1,10 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import {
-  StyleSheet,
-  TextInput,
-  View,
-  type TextInputProps,
-} from 'react-native';
+import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
 
 import { useTheme } from '@/theme';
 
@@ -55,9 +50,7 @@ export function TextField({
         style={{
           borderRadius: ringRadius,
           padding: 2,
-          backgroundColor: showFocusRing
-            ? colors.focusOffset
-            : 'transparent',
+          backgroundColor: showFocusRing ? colors.focusOffset : 'transparent',
         }}
       >
         {showFocusRing ? (
@@ -122,7 +115,11 @@ export function TextField({
         </View>
       </View>
       {error ? (
-        <AppText variant="caption" color={colors.danger} accessibilityLiveRegion="polite">
+        <AppText
+          variant="caption"
+          color={colors.danger}
+          accessibilityLiveRegion="polite"
+        >
           {error}
         </AppText>
       ) : hint ? (

@@ -31,8 +31,8 @@ Brand artwork comes from `waste-wise-web/frontend`:
 - App icon, adaptive icon, monochrome icon, and splash are generated from
   `public/favicon_io/android-chrome-512x512.png`.
 - In-app logo is generated from the same source.
-- Login backgrounds are `src/assets/images/login-day.webp` and
-  `src/assets/images/login-night.webp`.
+- The auth hero uses a theme-aware SVG gradient and the recycled logo mark in
+  `src/components/auth/auth-hero.tsx`.
 - Empty and not-found animations are `src/assets/lottie/empty.json` and
   `src/assets/lottie/404.json`.
 
@@ -43,6 +43,7 @@ The mobile app uses the existing NestJS API under `/api/v1` plus two small backe
 - Google auto-registration for unknown Google accounts with the default `user` role.
 - Native mobile session endpoints:
   - `POST /api/v1/auth/mobile/google`
+  - `POST /api/v1/auth/mobile/2fa/verify`
   - `POST /api/v1/auth/mobile/refresh`
   - `POST /api/v1/auth/mobile/logout`
 
@@ -91,6 +92,8 @@ Recommended URLs:
 | Production | `https://your-api-domain.com/api/v1` |
 
 Cleartext HTTP is enabled for development/preview builds only. Production builds must use HTTPS.
+`preview` and `production` builds fail early when `EXPO_PUBLIC_API_URL` or
+`EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` is missing.
 
 ## Run
 
@@ -115,20 +118,56 @@ bun run prebuild --platform android --clean
 
 ## Build APK
 
-```bash
-bunx --bun -p eas-cli eas login
-bunx --bun -p eas-cli eas init
-bun run build:apk
-```
+The `preview` profile produces an installable APK; `production` produces an AAB. Each
+profile reads the EAS environment variables of the same name (`environment` in `eas.json`).
 
-The `preview` profile produces an installable APK. The `production` profile produces an AAB.
+1. Log in and create the project once (the slug in `app.config.ts` is `waste-wise-mobile`;
+   it must match the slug of the project on expo.dev):
+
+   ```bash
+   bunx --bun -p eas-cli eas login
+   bunx --bun -p eas-cli eas whoami
+   bunx --bun -p eas-cli eas init
+   ```
+
+   `eas init` cannot write to `app.config.ts`. Copy the project ID it prints (also under
+   **Details** on expo.dev) and export it as `EAS_PROJECT_ID` locally, and add it as an EAS
+   environment variable too. If the project lives under a team account, add
+   `owner: '<team-slug>'` to `app.config.ts`.
+
+2. `.env` is gitignored and is not uploaded to EAS. In expo.dev, **Environment variables**,
+   create these for the `preview` (and `production`) environment:
+
+   | Variable | Value |
+   |---|---|
+   | `EXPO_PUBLIC_API_URL` | Public backend URL ending in `/api/v1` (not `localhost`; must be `https://`, enforced at build time) |
+   | `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` | Same value as backend `GOOGLE_CLIENT_ID` |
+   | `EAS_PROJECT_ID` | Project ID from step 1 |
+
+   `EXPO_PUBLIC_*` values are embedded in the app, so plain text visibility is fine. The
+   build fails early if the first two are missing.
+
+3. Build, then read the SHA-1 of the keystore EAS generated:
+
+   ```bash
+   bun run build:apk
+   bunx --bun -p eas-cli eas credentials
+   ```
+
+4. Add that SHA-1 to the Android OAuth client in Google Cloud (package
+   `com.bilcode.wastewise`) and wait a few minutes. Without it, Google Sign-In fails on the
+   release APK with `DEVELOPER_ERROR` (code 10), even though debug builds work.
+
+The phone needs Google Play Services, and the backend must be reachable from the phone with
+`GOOGLE_CLIENT_ID`, the database and storage configured.
 
 ## Verification
 
 ```bash
 bun run typecheck
 bun run lint
-bun test
+bun run format:check
+bun run test
 bunx --bun expo-doctor
 bun run export:android
 ```
@@ -148,6 +187,7 @@ bun run spec:generate
 | Feature | Endpoint |
 |---|---|
 | Google mobile login | `POST /auth/mobile/google` |
+| Mobile 2FA verify | `POST /auth/mobile/2fa/verify` |
 | Refresh | `POST /auth/mobile/refresh` |
 | Logout | `POST /auth/mobile/logout` |
 | Session identity | `GET /auth/me` |
@@ -162,8 +202,9 @@ AI classification runs inside NestJS when the report is created. Mobile never ca
 
 ## Behaviour
 
-- Login is Google-only. New Google accounts are registered automatically by NestJS.
-- Access tokens last 15 minutes; refresh rotates the token pair. A failed refresh clears the session.
+- Login is Google-only on one auth screen. New Google accounts are registered automatically by NestJS.
+- Accounts with 2FA enabled receive a short-lived challenge, then verify it on the mobile 2FA screen with an authenticator or recovery code. The challenge stays in memory and expires after 5 minutes.
+- Access tokens last 15 minutes; refresh rotates the token pair. An invalid or expired refresh token clears the session. Transient network failures keep the session and show a retry screen.
 - A report requires a photo, GPS coordinates, and a 3–2000 character description.
 - Photos are compressed client-side to JPEG below 5 MB before upload.
 - Create report is two steps: upload media, then create the report. Retrying after a failed create reuses the uploaded media ID.
@@ -173,7 +214,7 @@ AI classification runs inside NestJS when the report is created. Mobile never ca
 
 ## Out of scope
 
-Admin actions, status updates, editing/deleting submitted reports, offline submission, push notifications, iOS builds, and mobile 2FA. Accounts with 2FA enabled are directed to complete verification in the web app.
+Admin actions, status updates, editing/deleting submitted reports, offline submission, push notifications, iOS builds, and 2FA enrollment or disablement in mobile. Existing 2FA accounts can complete verification in mobile; enrollment remains web-only.
 
 Regenerate brand assets after changing the web source:
 

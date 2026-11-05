@@ -9,7 +9,14 @@ import { AppText } from './text';
 export function LoadingState({ label = 'Loading…' }: { label?: string }) {
   const { colors, spacing } = useTheme();
   return (
-    <View style={{ alignItems: 'center', justifyContent: 'center', padding: spacing.xxxl, gap: spacing.md }}>
+    <View
+      style={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: spacing.xxxl,
+        gap: spacing.md,
+      }}
+    >
       <ActivityIndicator color={colors.primary} size="large" />
       <AppText color={colors.mutedForeground}>{label}</AppText>
     </View>
@@ -22,12 +29,16 @@ export function EmptyState({
   actionLabel,
   onAction,
   showAnimation = true,
+  variant = 'bordered',
+  fill = false,
 }: {
   title: string;
   description: string;
   actionLabel?: string;
   onAction?: () => void;
   showAnimation?: boolean;
+  variant?: 'bordered' | 'plain';
+  fill?: boolean;
 }) {
   const { colors, spacing, radius } = useTheme();
   return (
@@ -37,10 +48,15 @@ export function EmptyState({
         justifyContent: 'center',
         padding: spacing.xxxl,
         gap: spacing.sm,
-        borderWidth: 1,
-        borderStyle: 'dashed',
-        borderColor: colors.borderSubtle,
-        borderRadius: radius.lg,
+        ...(fill ? { flex: 1 } : null),
+        ...(variant === 'bordered'
+          ? {
+              borderWidth: 1,
+              borderStyle: 'dashed' as const,
+              borderColor: colors.borderSubtle,
+              borderRadius: radius.lg,
+            }
+          : null),
       }}
     >
       {showAnimation ? (
@@ -56,7 +72,11 @@ export function EmptyState({
         {description}
       </AppText>
       {actionLabel && onAction ? (
-        <Button label={actionLabel} onPress={onAction} style={{ marginTop: spacing.sm }} />
+        <Button
+          label={actionLabel}
+          onPress={onAction}
+          style={{ marginTop: spacing.sm }}
+        />
       ) : null}
     </View>
   );
@@ -85,7 +105,9 @@ export function ErrorState({
         Something went wrong
       </AppText>
       <AppText color={colors.dangerForeground}>{message}</AppText>
-      {onRetry ? <Button label="Try again" variant="outline" onPress={onRetry} /> : null}
+      {onRetry ? (
+        <Button label="Try again" variant="outline" onPress={onRetry} />
+      ) : null}
     </View>
   );
 }
