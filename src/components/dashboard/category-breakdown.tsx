@@ -14,7 +14,11 @@ import {
   WASTE_CATEGORY_LABEL,
 } from '@/lib/reports';
 import { useTheme } from '@/theme';
-import type { ReportStats, WasteCategory } from '@/types/domain';
+import type {
+  CategoryFilter,
+  ReportStats,
+  WasteCategory,
+} from '@/types/domain';
 
 const COUNT_KEY: Record<WasteCategory, keyof ReportStats['byCategory']> = {
   ORGANIC_WASTE: 'organic',
@@ -27,19 +31,19 @@ export function CategoryBreakdown({
   onSelect,
 }: {
   stats: ReportStats;
-  onSelect: (category: WasteCategory) => void;
+  onSelect: (category: CategoryFilter) => void;
 }) {
   const { colors, radius, spacing } = useTheme();
   const rows = [
     ...WASTE_CATEGORIES.map((category) => ({
-      key: category as string,
+      filter: category as CategoryFilter,
       category: category as WasteCategory | null,
       label: WASTE_CATEGORY_LABEL[category],
       count: stats.byCategory[COUNT_KEY[category]] ?? 0,
       Icon: CATEGORY_ICON[category],
     })),
     {
-      key: 'UNCLASSIFIED',
+      filter: 'UNCLASSIFIED' as CategoryFilter,
       category: null,
       label: 'Unclassified',
       count: stats.byCategory.unclassified ?? 0,
@@ -51,7 +55,7 @@ export function CategoryBreakdown({
   return (
     <Card style={{ gap: spacing.sm }}>
       <SectionHeader title="By category" />
-      {rows.map(({ key, category, label, count, Icon }) => {
+      {rows.map(({ filter, category, label, count, Icon }) => {
         const color = categoryColor(colors, category);
         const content = (
           <>
@@ -100,24 +104,12 @@ export function CategoryBreakdown({
           paddingHorizontal: spacing.xs,
           borderRadius: radius.md,
         };
-        if (!category) {
-          return (
-            <View
-              key={key}
-              accessible
-              accessibilityLabel={`${label}: ${count} reports`}
-              style={[rowStyle, { paddingRight: spacing.xl + 2 }]}
-            >
-              {content}
-            </View>
-          );
-        }
         return (
           <Pressable
-            key={key}
+            key={filter}
             accessibilityRole="button"
             accessibilityLabel={`${label}: ${count} reports`}
-            onPress={() => onSelect(category)}
+            onPress={() => onSelect(filter)}
             style={({ pressed }) => [
               rowStyle,
               {

@@ -53,12 +53,13 @@ describe('report display mappings', () => {
   });
 });
 
-describe('parseWasteCategory', () => {
-  it('accepts known categories only', async () => {
-    const { parseWasteCategory } = await import('@/lib/reports');
-    expect(parseWasteCategory('PAPER_WASTE')).toBe('PAPER_WASTE');
-    expect(parseWasteCategory('GLASS')).toBeNull();
-    expect(parseWasteCategory(undefined)).toBeNull();
+describe('parseCategoryFilter', () => {
+  it('accepts known categories and unclassified only', async () => {
+    const { parseCategoryFilter } = await import('@/lib/reports');
+    expect(parseCategoryFilter('PAPER_WASTE')).toBe('PAPER_WASTE');
+    expect(parseCategoryFilter('UNCLASSIFIED')).toBe('UNCLASSIFIED');
+    expect(parseCategoryFilter('GLASS')).toBeNull();
+    expect(parseCategoryFilter(undefined)).toBeNull();
   });
 });
 

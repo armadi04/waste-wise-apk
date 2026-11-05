@@ -2,7 +2,12 @@ import { format, startOfYear, subDays } from 'date-fns';
 
 import { formatDayTitle } from '@/lib/format';
 import type { ThemeColors } from '@/theme/tokens';
-import type { ReportFilter, ReportStatus, WasteCategory } from '@/types/domain';
+import type {
+  CategoryFilter,
+  ReportFilter,
+  ReportStatus,
+  WasteCategory,
+} from '@/types/domain';
 
 export type Tone =
   'default' | 'info' | 'progress' | 'success' | 'warning' | 'danger';
@@ -182,10 +187,20 @@ export const WASTE_CATEGORIES: readonly WasteCategory[] = [
   'PAPER_WASTE',
 ];
 
-export function parseWasteCategory(value: unknown): WasteCategory | null {
+export const CATEGORY_FILTERS: readonly CategoryFilter[] = [
+  ...WASTE_CATEGORIES,
+  'UNCLASSIFIED',
+];
+
+export const CATEGORY_FILTER_LABEL: Record<CategoryFilter, string> = {
+  ...WASTE_CATEGORY_LABEL,
+  UNCLASSIFIED: 'Unclassified',
+};
+
+export function parseCategoryFilter(value: unknown): CategoryFilter | null {
   return typeof value === 'string' &&
-    (WASTE_CATEGORIES as readonly string[]).includes(value)
-    ? (value as WasteCategory)
+    (CATEGORY_FILTERS as readonly string[]).includes(value)
+    ? (value as CategoryFilter)
     : null;
 }
 

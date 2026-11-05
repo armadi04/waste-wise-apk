@@ -7,6 +7,8 @@ export type ReportStats = components['schemas']['ReportStatsDto'];
 export type ReportStatus = Report['status'];
 export type WasteCategory = NonNullable<Report['predictedCategory']>;
 export type ClassificationStatus = Report['classificationStatus'];
+/** List filter value: a waste category, or reports without one. */
+export type CategoryFilter = WasteCategory | 'UNCLASSIFIED';
 
 export interface PaginationMeta {
   total: number;
@@ -36,7 +38,7 @@ export interface ReportListParams {
   limit: number;
   status?: ReportStatus;
   search?: string;
-  category?: WasteCategory;
+  category?: CategoryFilter;
   /** Inclusive start date, YYYY-MM-DD. */
   from?: string;
   /** Inclusive end date, YYYY-MM-DD. */

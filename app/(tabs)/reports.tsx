@@ -29,10 +29,10 @@ import {
   DATE_PRESET_LABEL,
   dateRangeFor,
   groupByDay,
+  CATEGORY_FILTER_LABEL,
+  parseCategoryFilter,
   parseReportFilter,
-  parseWasteCategory,
   REPORT_FILTER_LABEL,
-  WASTE_CATEGORY_LABEL,
 } from '@/lib/reports';
 import { useTheme } from '@/theme';
 import type { ReportFilter, ReportStats } from '@/types/domain';
@@ -113,7 +113,7 @@ export default function ReportsScreen() {
   const [seenStatus, setSeenStatus] = useState(params.status);
   const [extra, setExtra] = useState<ReportExtraFilters>(() => ({
     ...EMPTY_EXTRA_FILTERS,
-    category: parseWasteCategory(params.category),
+    category: parseCategoryFilter(params.category),
   }));
   const [seenCategory, setSeenCategory] = useState(params.category);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -138,7 +138,7 @@ export default function ReportsScreen() {
   }
   if (params.category !== seenCategory) {
     setSeenCategory(params.category);
-    const next = parseWasteCategory(params.category);
+    const next = parseCategoryFilter(params.category);
     if (next) setExtra((current) => ({ ...current, category: next }));
   }
 
@@ -293,7 +293,7 @@ export default function ReportsScreen() {
           >
             {extra.category ? (
               <ActiveFilterChip
-                label={WASTE_CATEGORY_LABEL[extra.category]}
+                label={CATEGORY_FILTER_LABEL[extra.category]}
                 onRemove={() =>
                   setExtra((current) => ({ ...current, category: null }))
                 }

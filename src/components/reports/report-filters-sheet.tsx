@@ -7,15 +7,15 @@ import { AppText } from '@/components/ui/text';
 import {
   DATE_PRESET_LABEL,
   DATE_PRESETS,
-  WASTE_CATEGORIES,
-  WASTE_CATEGORY_LABEL,
+  CATEGORY_FILTER_LABEL,
+  CATEGORY_FILTERS,
   type DatePreset,
 } from '@/lib/reports';
 import { useTheme } from '@/theme';
-import type { WasteCategory } from '@/types/domain';
+import type { CategoryFilter } from '@/types/domain';
 
 export interface ReportExtraFilters {
-  category: WasteCategory | null;
+  category: CategoryFilter | null;
   date: DatePreset;
 }
 
@@ -93,11 +93,11 @@ function ChoiceGroup<T extends string>({
 
 const CATEGORY_OPTIONS = [
   { value: 'ALL', label: 'All categories' },
-  ...WASTE_CATEGORIES.map((category) => ({
+  ...CATEGORY_FILTERS.map((category) => ({
     value: category,
-    label: WASTE_CATEGORY_LABEL[category],
+    label: CATEGORY_FILTER_LABEL[category],
   })),
-] as { value: WasteCategory | 'ALL'; label: string }[];
+] as { value: CategoryFilter | 'ALL'; label: string }[];
 
 const DATE_OPTIONS = DATE_PRESETS.map((preset) => ({
   value: preset,
