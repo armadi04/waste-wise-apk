@@ -40,7 +40,12 @@ export function describeUserAgent(userAgent: string | null): DeviceInfo {
     };
   }
   // Older builds sent the HTTP library's default agent.
-  if (/^(okhttp|Dalvik)\//.test(userAgent) || /Expo/i.test(userAgent)) {
+  // React Native's default is `<App label>/<version>`, e.g. `WasteWise/1.0.0`.
+  if (
+    /^(okhttp|Dalvik)\//.test(userAgent) ||
+    /^WasteWise\/[\w.-]+$/.test(userAgent) ||
+    /Expo/i.test(userAgent)
+  ) {
     return { label: 'WasteWise Android app', kind: 'mobile-app' };
   }
   const browser = BROWSERS.find(([pattern]) => pattern.test(userAgent))?.[1];

@@ -16,6 +16,10 @@ describe('describeUserAgent', () => {
     });
   });
 
+  it('recognises the React Native default agent', () => {
+    expect(describeUserAgent('WasteWise/1.0.0').kind).toBe('mobile-app');
+  });
+
   it('recognises the mobile app', () => {
     expect(describeUserAgent('WasteWise-Mobile').kind).toBe('mobile-app');
     expect(describeUserAgent('okhttp/4.12.0').label).toBe(
