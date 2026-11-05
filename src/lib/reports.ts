@@ -59,6 +59,13 @@ export const CLASSIFICATION_ERROR_LABEL: Record<string, string> = {
   MEDIA_UNAVAILABLE: 'The report photo could not be read by the AI service.',
 };
 
+/** Below this confidence the AI category is shown with a "please verify" note. */
+export const LOW_CONFIDENCE_THRESHOLD = 0.6;
+
+export function isLowConfidence(value: number | null): boolean {
+  return value !== null && value < LOW_CONFIDENCE_THRESHOLD;
+}
+
 export const REPORT_STATUSES: readonly ReportStatus[] = [
   'PENDING',
   'IN_PROGRESS',

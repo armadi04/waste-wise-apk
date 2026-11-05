@@ -157,4 +157,27 @@ describe('report detail actions', () => {
     );
     expect(state.remove.mutateAsync).toHaveBeenCalledWith(5);
   });
+
+  it('flags a low-confidence classification', async () => {
+    state.detail.data = makeReport({ confidence: 0.54 });
+    await render(<ReportDetailScreen />);
+    expect(screen.getByTestId('low-confidence-note')).toBeTruthy();
+  });
+
+  it('does not flag a confident classification', async () => {
+    state.detail.data = makeReport({ confidence: 0.9 });
+    await render(<ReportDetailScreen />);
+    expect(screen.queryByTestId('low-confidence-note')).toBeNull();
+  });
+
+  it('does not flag a failed classification with no confidence', async () => {
+    state.detail.data = makeReport({
+      classificationStatus: 'FAILED',
+      classificationError: 'ML_UNAVAILABLE',
+      predictedCategory: null,
+      confidence: null,
+    });
+    await render(<ReportDetailScreen />);
+    expect(screen.queryByTestId('low-confidence-note')).toBeNull();
+  });
 });

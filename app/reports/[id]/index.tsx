@@ -29,7 +29,11 @@ import { AppText } from '@/components/ui/text';
 import { useDeleteReport, useReportDetail } from '@/hooks/use-reports';
 import { formatCoordinate, formatDateTime } from '@/lib/format';
 import { mediaViewUrl } from '@/lib/media-url';
-import { canModifyReport, CLASSIFICATION_ERROR_LABEL } from '@/lib/reports';
+import {
+  canModifyReport,
+  CLASSIFICATION_ERROR_LABEL,
+  isLowConfidence,
+} from '@/lib/reports';
 import { useTheme } from '@/theme';
 
 export default function ReportDetailScreen() {
@@ -218,6 +222,24 @@ export default function ReportDetailScreen() {
                 </AppText>
               </View>
             </View>
+            {report.classificationStatus === 'COMPLETED' &&
+            isLowConfidence(report.confidence) ? (
+              <View
+                testID="low-confidence-note"
+                style={{
+                  padding: spacing.md,
+                  borderRadius: radius.md,
+                  backgroundColor: colors.warningBackground,
+                  borderWidth: 1,
+                  borderColor: colors.warningBorder,
+                }}
+              >
+                <AppText color={colors.warningForeground}>
+                  The AI is not sure about this category. Please check the photo
+                  before relying on it.
+                </AppText>
+              </View>
+            ) : null}
             {report.classificationStatus === 'FAILED' ? (
               <View
                 style={{
