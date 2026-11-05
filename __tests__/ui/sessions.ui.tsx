@@ -80,14 +80,19 @@ const m = (
 ).__m;
 
 const now = new Date().toISOString();
-const session = (id: number, userAgent: string, isCurrent: boolean) => ({
+const session = (
+  id: number,
+  userAgent: string,
+  isCurrent: boolean,
+  audience = 'admin',
+) => ({
   id,
   sessionId: `s${id}`,
   userId: 7,
   ipAddress: '10.0.0.' + id,
   userAgent,
   impersonatedById: null,
-  audience: 'admin',
+  audience,
   lastActiveAt: now,
   expiresAt: now,
   absoluteExpiresAt: now,
@@ -101,7 +106,12 @@ describe('sessions screen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     m.list.data = [
-      session(1, 'okhttp/4.12.0', true),
+      session(
+        1,
+        'WasteWise-Mobile/1.0.0 (Android 14; Xiaomi 23078RKD5C)',
+        true,
+        'mobile',
+      ),
       session(
         2,
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/130.0 Safari/537.36',
@@ -112,11 +122,14 @@ describe('sessions screen', () => {
 
   it('labels devices and protects the current one', async () => {
     await render(<SessionsScreen />);
-    expect(screen.getByText('WasteWise Android app')).toBeTruthy();
+    expect(screen.getByText('WasteWise app · Xiaomi 23078RKD5C')).toBeTruthy();
     expect(screen.getByText('This device')).toBeTruthy();
+    expect(screen.getByText('Mobile')).toBeTruthy();
+    expect(screen.getByText(/^Android 14 · /)).toBeTruthy();
     expect(screen.getByText('Chrome on Windows')).toBeTruthy();
+    expect(screen.getByText('Browser')).toBeTruthy();
     expect(
-      screen.queryByLabelText('Sign out WasteWise Android app'),
+      screen.queryByLabelText('Sign out WasteWise app · Xiaomi 23078RKD5C'),
     ).toBeNull();
   });
 

@@ -23,7 +23,11 @@ import {
   useRevokeSession,
 } from '@/hooks/use-sessions';
 import { formatRelativeTime } from '@/lib/format';
-import { describeUserAgent, type DeviceInfo } from '@/lib/user-agent';
+import {
+  audienceLabel,
+  describeUserAgent,
+  type DeviceInfo,
+} from '@/lib/user-agent';
 import { useTheme } from '@/theme';
 import type { OwnSession } from '@/types/domain';
 
@@ -47,7 +51,11 @@ function SessionRow({
   const device = describeUserAgent(session.userAgent);
   const Icon = DEVICE_ICON[device.kind];
   const lastActive = formatRelativeTime(session.lastActiveAt);
-  const meta = [session.ipAddress, `Active ${lastActive.toLowerCase()}`]
+  const meta = [
+    device.system,
+    session.ipAddress,
+    `Active ${lastActive.toLowerCase()}`,
+  ]
     .filter(Boolean)
     .join(' · ');
 
@@ -55,7 +63,9 @@ function SessionRow({
     <View
       accessible={session.isCurrent}
       accessibilityLabel={
-        session.isCurrent ? `${device.label}, this device. ${meta}` : undefined
+        session.isCurrent
+          ? `${device.label}, ${audienceLabel(session.audience)}, this device. ${meta}`
+          : undefined
       }
       style={{
         flexDirection: 'row',
@@ -92,6 +102,7 @@ function SessionRow({
           }}
         >
           <AppText weight="semibold">{device.label}</AppText>
+          <Badge label={audienceLabel(session.audience)} />
           {session.isCurrent ? (
             <Badge label="This device" tone="success" dot />
           ) : null}

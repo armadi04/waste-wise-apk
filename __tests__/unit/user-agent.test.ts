@@ -1,8 +1,21 @@
 import { describe, expect, it } from 'bun:test';
 
-import { describeUserAgent } from '@/lib/user-agent';
+import { audienceLabel, describeUserAgent } from '@/lib/user-agent';
+import { buildUserAgent } from '@/lib/user-agent-header';
 
 describe('describeUserAgent', () => {
+  it('names the device from the app user agent', () => {
+    expect(
+      describeUserAgent(
+        'WasteWise-Mobile/1.0.0 (Android 14; Xiaomi 23078RKD5C)',
+      ),
+    ).toEqual({
+      label: 'WasteWise app · Xiaomi 23078RKD5C',
+      kind: 'mobile-app',
+      system: 'Android 14',
+    });
+  });
+
   it('recognises the mobile app', () => {
     expect(describeUserAgent('WasteWise-Mobile').kind).toBe('mobile-app');
     expect(describeUserAgent('okhttp/4.12.0').label).toBe(
@@ -31,5 +44,44 @@ describe('describeUserAgent', () => {
   it('falls back for missing or unknown agents', () => {
     expect(describeUserAgent(null).label).toBe('Unknown device');
     expect(describeUserAgent('curl/8.0').label).toBe('Unknown device');
+  });
+});
+
+describe('buildUserAgent', () => {
+  it('describes app version, Android release and device', () => {
+    expect(
+      buildUserAgent(
+        { Release: '14', Brand: 'xiaomi', Model: '23078RKD5C' },
+        '1.2.0',
+        'android',
+      ),
+    ).toBe('WasteWise-Mobile/1.2.0 (Android 14; Xiaomi 23078RKD5C)');
+  });
+
+  it('does not repeat the brand when the model already includes it', () => {
+    expect(
+      buildUserAgent(
+        { Release: '13', Brand: 'samsung', Model: 'Samsung SM-A546E' },
+        '1.0.0',
+        'android',
+      ),
+    ).toBe('WasteWise-Mobile/1.0.0 (Android 13; Samsung SM-A546E)');
+  });
+
+  it('strips characters that would break the header format', () => {
+    expect(
+      buildUserAgent(
+        { Release: '14', Brand: 'Acme', Model: 'X1 (Pro); é' },
+        undefined,
+        'android',
+      ),
+    ).toBe('WasteWise-Mobile/0.0.0 (Android 14; Acme X1 Pro)');
+  });
+});
+
+describe('audienceLabel', () => {
+  it('maps audiences to user-facing labels', () => {
+    expect(audienceLabel('mobile')).toBe('Mobile');
+    expect(audienceLabel('admin')).toBe('Browser');
   });
 });
