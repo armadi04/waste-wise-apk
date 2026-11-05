@@ -49,9 +49,7 @@ export type ReportListFilters = Pick<
   'category' | 'from' | 'to'
 >;
 
-export type UpdateReportPayload = Partial<
-  components['schemas']['CreateReportDto']
->;
+export type UpdateReportPayload = components['schemas']['UpdateReportDto'];
 
 export type ReportFilter = 'ALL' | ReportStatus;
 

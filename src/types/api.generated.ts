@@ -1619,7 +1619,12 @@ export interface components {
             latitude?: number;
             longitude?: number;
         };
-        UpdateReportDto: Record<string, never>;
+        UpdateReportDto: {
+            description?: string;
+            mediaId?: number;
+            latitude?: number;
+            longitude?: number;
+        };
         UpdateReportStatusDto: {
             /** @enum {string} */
             status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "REJECTED";
