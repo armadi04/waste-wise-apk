@@ -56,6 +56,8 @@ export const CLASSIFICATION_ERROR_LABEL: Record<string, string> = {
   ML_UNAVAILABLE: 'The AI service is unavailable. No category was saved.',
   ML_REJECTED_IMAGE: 'The AI service rejected this photo.',
   ML_INVALID_RESPONSE: 'The AI service returned an invalid result.',
+  ML_LOW_CONFIDENCE:
+    'This photo does not look like organic, plastic or paper waste. Try a clearer photo of the waste.',
   MEDIA_UNAVAILABLE: 'The report photo could not be read by the AI service.',
 };
 

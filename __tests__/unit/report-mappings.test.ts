@@ -3,6 +3,7 @@ import { describe, expect, it } from 'bun:test';
 import { mediaViewUrl } from '@/lib/media-url';
 import { lightColors } from '@/theme/tokens';
 import {
+  CLASSIFICATION_ERROR_LABEL,
   REPORT_STATUS_LABEL,
   REPORT_STATUS_TONE,
   WASTE_CATEGORY_LABEL,
@@ -92,5 +93,19 @@ describe('canModifyReport', () => {
     expect(canModifyReport({ reporterId: 7, status: 'PENDING' }, null)).toBe(
       false,
     );
+  });
+});
+
+describe('classification error labels', () => {
+  it('explains every error code the backend can store', () => {
+    for (const code of [
+      'ML_UNAVAILABLE',
+      'ML_REJECTED_IMAGE',
+      'ML_INVALID_RESPONSE',
+      'ML_LOW_CONFIDENCE',
+      'MEDIA_UNAVAILABLE',
+    ]) {
+      expect(CLASSIFICATION_ERROR_LABEL[code]).toBeTruthy();
+    }
   });
 });
