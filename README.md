@@ -118,13 +118,48 @@ bun run prebuild --platform android --clean
 
 ## Build APK
 
-```bash
-bunx --bun -p eas-cli eas login
-bunx --bun -p eas-cli eas init
-bun run build:apk
-```
+The `preview` profile produces an installable APK; `production` produces an AAB. Each
+profile reads the EAS environment variables of the same name (`environment` in `eas.json`).
 
-The `preview` profile produces an installable APK. The `production` profile produces an AAB.
+1. Log in and create the project once (the slug in `app.config.ts` is `waste-wise-mobile`;
+   it must match the slug of the project on expo.dev):
+
+   ```bash
+   bunx --bun -p eas-cli eas login
+   bunx --bun -p eas-cli eas whoami
+   bunx --bun -p eas-cli eas init
+   ```
+
+   `eas init` cannot write to `app.config.ts`. Copy the project ID it prints (also under
+   **Details** on expo.dev) and export it as `EAS_PROJECT_ID` locally, and add it as an EAS
+   environment variable too. If the project lives under a team account, add
+   `owner: '<team-slug>'` to `app.config.ts`.
+
+2. `.env` is gitignored and is not uploaded to EAS. In expo.dev, **Environment variables**,
+   create these for the `preview` (and `production`) environment:
+
+   | Variable | Value |
+   |---|---|
+   | `EXPO_PUBLIC_API_URL` | Public backend URL ending in `/api/v1` (not `localhost`; must be `https://`, enforced at build time) |
+   | `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` | Same value as backend `GOOGLE_CLIENT_ID` |
+   | `EAS_PROJECT_ID` | Project ID from step 1 |
+
+   `EXPO_PUBLIC_*` values are embedded in the app, so plain text visibility is fine. The
+   build fails early if the first two are missing.
+
+3. Build, then read the SHA-1 of the keystore EAS generated:
+
+   ```bash
+   bun run build:apk
+   bunx --bun -p eas-cli eas credentials
+   ```
+
+4. Add that SHA-1 to the Android OAuth client in Google Cloud (package
+   `com.bilcode.wastewise`) and wait a few minutes. Without it, Google Sign-In fails on the
+   release APK with `DEVELOPER_ERROR` (code 10), even though debug builds work.
+
+The phone needs Google Play Services, and the backend must be reachable from the phone with
+`GOOGLE_CLIENT_ID`, the database and storage configured.
 
 ## Verification
 
