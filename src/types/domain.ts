@@ -61,8 +61,6 @@ export type NotificationType = AppNotification['type'];
 export type PaginatedNotifications =
   components['schemas']['PaginatedNotificationResponse'];
 
-export type ReleaseNotes = components['schemas']['ReleaseNotesDto'];
-
 export type TimeZoneConfig = components['schemas']['TimeZoneConfigResponseDto'];
 export type TimeZonePreference =
   components['schemas']['TimeZonePreferenceResponseDto'];

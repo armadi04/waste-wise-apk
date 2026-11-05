@@ -6,7 +6,6 @@ import {
   MonitorSmartphone,
   Pencil,
   ShieldCheck,
-  Sparkles,
 } from 'lucide-react-native';
 import { useState } from 'react';
 import { RefreshControl, View } from 'react-native';
@@ -151,12 +150,6 @@ export default function ProfileScreen() {
           title="Notifications"
           value={unread ? `${unread} new` : undefined}
           onPress={() => router.push('/notifications')}
-        />
-        <ListRow
-          icon={Sparkles}
-          title="What's new"
-          value={version ? `v${version}` : undefined}
-          onPress={() => router.push('/changelog')}
         />
       </ListGroup>
 

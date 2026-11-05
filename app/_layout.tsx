@@ -64,7 +64,6 @@ function RootNavigator() {
           <Stack.Screen name="reports/[id]/index" />
           <Stack.Screen name="reports/[id]/edit" />
           <Stack.Screen name="notifications" />
-          <Stack.Screen name="changelog" />
           <Stack.Screen name="profile/edit" />
           <Stack.Screen name="profile/security" />
           <Stack.Screen name="profile/sessions" />

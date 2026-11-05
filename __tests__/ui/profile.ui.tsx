@@ -122,7 +122,6 @@ describe('profile screen', () => {
       ['Security, Two-factor authentication, On', '/profile/security'],
       ['Sessions, Devices signed in to your account, 2', '/profile/sessions'],
       ['Notifications, 2 new', '/notifications'],
-      ["What's new, v1.2.3", '/changelog'],
     ] as const) {
       await fireEvent.press(screen.getByLabelText(label));
       expect(router.push).toHaveBeenLastCalledWith(route);

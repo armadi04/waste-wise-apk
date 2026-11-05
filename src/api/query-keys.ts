@@ -14,7 +14,6 @@ export const queryKeys = {
     list: ['notifications', 'list'] as const,
     unread: ['notifications', 'unread'] as const,
   },
-  changelog: ['changelog'] as const,
   sessions: { mine: ['sessions', 'mine'] as const },
   timeZone: {
     config: ['time-zone', 'config'] as const,

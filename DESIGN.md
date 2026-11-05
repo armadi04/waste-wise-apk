@@ -233,7 +233,7 @@ supports them. Long list rows use truncation plus accessible full content where 
   `radius.xl` top corners, a drag handle, a header title and an optional footer of actions.
   Mount sheets only while open so their draft state resets.
 - Profile is a hub: identity card with "Edit profile", then `ListGroup`/`ListRow` groups
-  (Account: Security, Sessions; App: Notifications, What's new). Rows are at least 60 dp,
+  (Account: Security, Sessions; App: Notifications). Rows are at least 60 dp,
   show a short trailing value (On/Off, counts, version) and a chevron.
 - Home shows a bell with an unread badge (`dangerSolid`, capped at 99+) next to the avatar.
   Notification rows show a type icon, bold title and dot while unread; tapping marks them
