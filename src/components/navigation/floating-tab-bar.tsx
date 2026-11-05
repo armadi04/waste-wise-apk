@@ -1,9 +1,10 @@
 import { useRouter, type Tabs } from 'expo-router';
 import { Plus } from 'lucide-react-native';
-import { useEffect, useState, type ComponentProps } from 'react';
-import { Keyboard, Pressable, View } from 'react-native';
+import { type ComponentProps } from 'react';
+import { Pressable, View } from 'react-native';
 
 import { AppText } from '@/components/ui/text';
+import { useKeyboardVisible } from '@/hooks/use-keyboard-visible';
 import { useTheme } from '@/theme';
 
 import {
@@ -16,23 +17,6 @@ export type FloatingTabBarProps = Parameters<
 >[0];
 
 const PILL_PADDING = 4;
-
-function useKeyboardVisible(): boolean {
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const show = Keyboard.addListener('keyboardDidShow', () =>
-      setVisible(true),
-    );
-    const hide = Keyboard.addListener('keyboardDidHide', () =>
-      setVisible(false),
-    );
-    return () => {
-      show.remove();
-      hide.remove();
-    };
-  }, []);
-  return visible;
-}
 
 export function FloatingTabBar({
   state,
