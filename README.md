@@ -91,9 +91,9 @@ Recommended URLs:
 | Physical device on Wi-Fi | `http://<LAN-IP>:3000/api/v1` |
 | Production | `https://your-api-domain.com/api/v1` |
 
-Cleartext HTTP is enabled for development/preview builds only. Production builds must use HTTPS.
-`preview` and `production` builds fail early when `EXPO_PUBLIC_API_URL` or
-`EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` is missing.
+Cleartext HTTP is allowed in local development builds only. `preview` and `production` builds
+fail early when `EXPO_PUBLIC_API_URL` or `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` is missing, or when the
+API URL does not start with `https://`.
 
 ## Run
 
