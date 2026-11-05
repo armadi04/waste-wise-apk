@@ -24,7 +24,7 @@
     "api:generate": "bunx --bun -p typescript@5.9.3 -p openapi-typescript@7.13.0 openapi-typescript ../waste-wise-web/backend/swagger.json -o src/types/api.generated.ts",
     "export:android": "bun --bun expo export --platform android",
     "doctor": "bunx --bun expo-doctor",
-    "build:apk": "bunx --bun -p eas-cli eas build -p android --profile preview"
+    "build:apk": "bunx -p eas-cli eas build -p android --profile preview"
   },
   "dependencies": {
     "@expo-google-fonts/plus-jakarta-sans": "^0.4.2",
