@@ -17,6 +17,13 @@ function assertBuildEnvironment(): void {
       `Missing required environment variables for ${profile} build: ${missing.join(', ')}`,
     );
   }
+
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL?.trim() ?? '';
+  if (!apiUrl.toLowerCase().startsWith('https://')) {
+    throw new Error(
+      `EXPO_PUBLIC_API_URL must use https:// for ${profile} builds (tokens and photos must not travel over cleartext).`,
+    );
+  }
 }
 
 export default ({ config }: ConfigContext): ExpoConfig => {
@@ -69,8 +76,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         'expo-build-properties',
         {
           android: {
+            // Cleartext (http://10.0.2.2, adb reverse) is for local dev builds only.
             usesCleartextTraffic:
-              process.env.EAS_BUILD_PROFILE !== 'production',
+              process.env.EAS_BUILD_PROFILE !== 'production' &&
+              process.env.EAS_BUILD_PROFILE !== 'preview',
           },
         },
       ],

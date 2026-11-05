@@ -29,6 +29,7 @@ import { AppText } from '@/components/ui/text';
 import { useDeleteReport, useReportDetail } from '@/hooks/use-reports';
 import { formatCoordinate, formatDateTime } from '@/lib/format';
 import { mediaViewUrl } from '@/lib/media-url';
+import { mediaImageSource } from '@/lib/media-source';
 import {
   canModifyReport,
   CLASSIFICATION_ERROR_LABEL,
@@ -115,7 +116,7 @@ export default function ReportDetailScreen() {
           >
             {photoUri ? (
               <Image
-                source={{ uri: photoUri }}
+                source={mediaImageSource(photoUri)}
                 style={{ width: '100%', height: 320 }}
                 contentFit="contain"
                 transition={150}

@@ -4,6 +4,7 @@ import { ActivityIndicator, Pressable, View } from 'react-native';
 
 import { Button } from '@/components/ui/button';
 import { AppText } from '@/components/ui/text';
+import { mediaImageSource } from '@/lib/media-source';
 import { useTheme } from '@/theme';
 
 export function PhotoPicker({
@@ -40,7 +41,7 @@ export function PhotoPicker({
           }}
         >
           <Image
-            source={{ uri }}
+            source={mediaImageSource(uri)}
             style={{ width: '100%', height: '100%' }}
             contentFit="cover"
             accessibilityLabel="Selected report photo"

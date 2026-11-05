@@ -5,6 +5,7 @@ import { Pressable, View } from 'react-native';
 import { AppText } from '@/components/ui/text';
 import { formatRelativeTime } from '@/lib/format';
 import { mediaViewUrl } from '@/lib/media-url';
+import { mediaImageSource } from '@/lib/media-source';
 import { REPORT_STATUS_LABEL } from '@/lib/reports';
 import { useTheme } from '@/theme';
 import type { Report } from '@/types/domain';
@@ -58,7 +59,7 @@ export function ReportListItem({
       >
         {uri ? (
           <Image
-            source={{ uri }}
+            source={mediaImageSource(uri)}
             style={{ width: THUMB, height: THUMB }}
             contentFit="cover"
             transition={150}
