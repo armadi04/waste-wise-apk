@@ -1,3 +1,5 @@
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 import axios, {
   create as createAxios,
   type AxiosError,
@@ -11,11 +13,18 @@ import {
   saveTokens,
 } from '@/auth/token-storage';
 import { API_BASE_URL } from '@/lib/config';
+import { buildUserAgent } from '@/lib/user-agent-header';
 
 import { ApiError, toApiError } from './errors';
 import { isAuthRoute, isCodeRejection, isInvalidSessionError } from './session';
 
 type UnauthorizedHandler = () => void | Promise<void>;
+
+const USER_AGENT = buildUserAgent(
+  Platform.constants as unknown as Record<string, unknown>,
+  Constants.expoConfig?.version,
+  Platform.OS,
+);
 
 let unauthorizedHandler: UnauthorizedHandler | null = null;
 let refreshing: Promise<string> | null = null;
@@ -47,6 +56,7 @@ async function refreshAccessToken(): Promise<string> {
         headers: {
           'Content-Type': 'application/json',
           'X-Client': 'WasteWise-Mobile',
+          'User-Agent': USER_AGENT,
         },
       },
     );
@@ -65,6 +75,7 @@ const api = createAxios({
   timeout: 30_000,
   headers: {
     'X-Client': 'WasteWise-Mobile',
+    'User-Agent': USER_AGENT,
   },
 });
 
