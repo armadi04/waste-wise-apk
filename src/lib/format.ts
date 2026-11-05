@@ -19,7 +19,10 @@ export function formatDateTime(
 export function formatConfidence(value: number | null | undefined): string {
   if (value === null || value === undefined || !Number.isFinite(value))
     return '—';
-  return `${(value * 100).toFixed(1)}%`;
+  // Truncate instead of rounding so 0.9999 shows 99.9%, never an overstated
+  // 100.0%. The epsilon absorbs float error (0.57 * 1000 = 569.999...).
+  const tenths = Math.floor(value * 1000 + 1e-6) / 10;
+  return `${tenths.toFixed(1)}%`;
 }
 
 export function formatCoordinate(value: number | null | undefined): string {

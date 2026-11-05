@@ -9,6 +9,7 @@ import { View } from 'react-native';
 
 import { Badge } from '@/components/ui/badge';
 import { AppText } from '@/components/ui/text';
+import { formatConfidence } from '@/lib/format';
 import {
   categoryColor,
   REPORT_STATUS_LABEL,
@@ -92,5 +93,5 @@ export function ConfidenceText({ value }: { value: number | null }) {
   const { colors } = useTheme();
   if (value === null)
     return <AppText color={colors.mutedForeground}>—</AppText>;
-  return <AppText weight="semibold">{(value * 100).toFixed(1)}%</AppText>;
+  return <AppText weight="semibold">{formatConfidence(value)}</AppText>;
 }

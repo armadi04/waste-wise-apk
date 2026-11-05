@@ -2,6 +2,7 @@ import { describe, expect, it } from 'bun:test';
 
 import {
   capitalize,
+  formatConfidence,
   formatRelativeTime,
   greeting,
   roundCoordinate,
@@ -86,5 +87,26 @@ describe('groupByDay', () => {
 
   it('returns no sections for no items', () => {
     expect(groupByDay([], now)).toEqual([]);
+  });
+});
+
+describe('formatConfidence', () => {
+  it('never overstates the stored confidence', () => {
+    expect(formatConfidence(0.9999)).toBe('99.9%');
+    expect(formatConfidence(0.9997380375862122)).toBe('99.9%');
+    expect(formatConfidence(0.5385528802871704)).toBe('53.8%');
+  });
+
+  it('keeps exact values and float-edge values intact', () => {
+    expect(formatConfidence(1)).toBe('100.0%');
+    expect(formatConfidence(0)).toBe('0.0%');
+    expect(formatConfidence(0.57)).toBe('57.0%');
+    expect(formatConfidence(0.7574)).toBe('75.7%');
+  });
+
+  it('shows a dash when there is no confidence', () => {
+    expect(formatConfidence(null)).toBe('—');
+    expect(formatConfidence(undefined)).toBe('—');
+    expect(formatConfidence(Number.NaN)).toBe('—');
   });
 });
