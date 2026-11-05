@@ -1,0 +1,14 @@
+appId: com.bilcode.wastewise
+name: Smoke - cold launch shows the Google sign-in screen
+tags:
+  - smoke
+---
+- clearState
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+      id: google-sign-in-button
+    timeout: 30000
+- assertVisible:
+    id: google-sign-in-button

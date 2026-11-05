@@ -17,6 +17,7 @@
     "test": "bun run test:unit && bun run test:ui",
     "test:unit": "bun test __tests__/unit",
     "test:ui": "jest --config jest.config.js",
+    "test:e2e": "maestro test e2e/flows",
     "format": "prettier --write \"app/**/*.{ts,tsx}\" \"src/**/*.{ts,tsx}\" \"__tests__/**/*.{ts,tsx}\" \"*.{ts,js,json}\"",
     "format:check": "prettier --check \"app/**/*.{ts,tsx}\" \"src/**/*.{ts,tsx}\" \"__tests__/**/*.{ts,tsx}\" \"*.{ts,js,json}\"",
     "verify": "bun run typecheck && bun run lint && bun run format:check && bun run test",
