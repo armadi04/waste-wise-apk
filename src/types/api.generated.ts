@@ -463,23 +463,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/changelog": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Published release notes, newest first */
-        get: operations["ChangelogController_findAll_v1"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -752,77 +735,6 @@ export interface paths {
         put?: never;
         /** Mark all notifications as read */
         post: operations["NotificationsController_markAllAsRead_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/oauth/token": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Issue an access token (client_credentials grant) */
-        post: operations["OAuthController_token_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/oauth/clients": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List OAuth clients */
-        get: operations["OAuthController_findAll_v1"];
-        put?: never;
-        /** Register an OAuth client (returns the secret once) */
-        post: operations["OAuthController_create_v1"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/oauth/clients/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get an OAuth client by id */
-        get: operations["OAuthController_findOne_v1"];
-        put?: never;
-        post?: never;
-        /** Revoke (soft-delete) an OAuth client */
-        delete: operations["OAuthController_remove_v1"];
-        options?: never;
-        head?: never;
-        /** Update an OAuth client */
-        patch: operations["OAuthController_update_v1"];
-        trace?: never;
-    };
-    "/api/v1/oauth/clients/bulk-delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Revoke (soft-delete) multiple OAuth clients */
-        post: operations["OAuthController_bulkRemove_v1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1506,14 +1418,13 @@ export interface components {
         Media: {
             id: number;
             /** @enum {string} */
-            provider: "depot" | "s3";
+            provider: "s3";
             storageProfile: string;
             filename: string;
             originalName: string | null;
             mimetype: string;
             size: number | null;
             path: string | null;
-            depotFileId: number | null;
             url: string | null;
             driveId: string | null;
             webviewLink: string | null;
@@ -1561,7 +1472,7 @@ export interface components {
             /** Format: date-time */
             twoFactorEnabledAt: string | null;
             /** @enum {string} */
-            registerMethod: "EMAIL_OTP" | "GOOGLE" | "INVITATION" | "SSO" | "SEEDER" | "UNKNOWN";
+            registerMethod: "EMAIL_OTP" | "GOOGLE" | "INVITATION" | "SEEDER" | "UNKNOWN";
             /**
              * @description Derived account state; populated by the API presenter.
              * @enum {string}
@@ -1578,16 +1489,6 @@ export interface components {
              * @example admin
              */
             role: string;
-        };
-        ReleaseNotesDto: {
-            /** @example 1.4.0 */
-            version: string;
-            /** @description Release body in Markdown */
-            notes: string;
-            /** Format: date-time */
-            publishedAt: string | null;
-            /** @description Release page URL */
-            url: string;
         };
         CreateInvitationDto: {
             /** @example user@example.com */
@@ -1664,24 +1565,6 @@ export interface components {
             meta: components["schemas"]["PaginationMetaDto"];
             data: components["schemas"]["Notification"][];
         };
-        TokenRequestDto: {
-            /** @enum {string} */
-            grant_type: "client_credentials";
-            client_id: string;
-            client_secret: string;
-            /** @description Space-delimited scopes to request (subset of the client's). */
-            scope?: string;
-        };
-        CreateOAuthClientDto: {
-            /** @description Human-readable name for the client. */
-            name: string;
-            /** @description Permission scopes this client may request. */
-            scopes: string[];
-        };
-        UpdateOAuthClientDto: {
-            /** @description Enable or disable the client. */
-            isActive?: boolean;
-        };
         CreatePermissionDto: Record<string, never>;
         PaginatedPermissionResponse: {
             meta: components["schemas"]["PaginationMetaDto"];
@@ -1755,7 +1638,6 @@ export interface components {
             ipAddress: string | null;
             userAgent: string | null;
             impersonatedById: number | null;
-            isSso: boolean;
             /** @enum {string} */
             audience: "admin";
             /** Format: date-time */
@@ -1780,7 +1662,6 @@ export interface components {
             ipAddress: string | null;
             userAgent: string | null;
             impersonatedById: number | null;
-            isSso: boolean;
             /** @enum {string} */
             audience: "admin";
             /** Format: date-time */
@@ -2493,25 +2374,6 @@ export interface operations {
             };
         };
     };
-    ChangelogController_findAll_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReleaseNotesDto"][];
-                };
-            };
-        };
-    };
     HealthController_check_v1: {
         parameters: {
             query?: never;
@@ -3043,154 +2905,6 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    OAuthController_token_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TokenRequestDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    OAuthController_findAll_v1: {
-        parameters: {
-            query?: {
-                page?: number;
-                limit?: number;
-                search?: string;
-                sort?: string;
-                direction?: "ASC" | "DESC";
-                paginated?: boolean;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    OAuthController_create_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateOAuthClientDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    OAuthController_findOne_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    OAuthController_remove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    OAuthController_update_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateOAuthClientDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    OAuthController_bulkRemove_v1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BulkDeleteDto"];
-            };
-        };
         responses: {
             200: {
                 headers: {
@@ -3954,7 +3668,7 @@ export interface operations {
                 /** @description Creation window in the selected report timezone, default Asia/Jakarta; 1m and 3m use 30 and 90 days. */
                 createdIn?: "today" | "7d" | "1m" | "3m";
                 /** @description Method used to first create the account. */
-                registerMethod?: "EMAIL_OTP" | "GOOGLE" | "INVITATION" | "SSO" | "SEEDER" | "UNKNOWN";
+                registerMethod?: "EMAIL_OTP" | "GOOGLE" | "INVITATION" | "SEEDER" | "UNKNOWN";
             };
             header?: never;
             path?: never;

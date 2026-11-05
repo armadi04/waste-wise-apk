@@ -87,7 +87,6 @@ const session = (id: number, userAgent: string, isCurrent: boolean) => ({
   ipAddress: '10.0.0.' + id,
   userAgent,
   impersonatedById: null,
-  isSso: false,
   audience: 'admin',
   lastActiveAt: now,
   expiresAt: now,
